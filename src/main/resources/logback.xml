@@ -1,0 +1,34 @@
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  -->
+
+<configuration>
+
+  <springProperty scope="context" name="log.path" source="log.path"/>
+
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <Pattern>
+        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{TASK_ID}]- %msg%n
+      </Pattern>
+    </encoder>
+  </appender>
+  <springProfile name="opentelemetry">
+    <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    </appender>
+    <logger additivity="false" level="info" name="org.eclipse.xpanse">
+      <appender-ref ref="OpenTelemetry"/>
+    </logger>
+    <root level="error">
+      <appender-ref ref="OpenTelemetry"/>
+    </root>
+  </springProfile>
+
+  <logger additivity="false" level="info" name="org.eclipse.xpanse">
+    <appender-ref ref="Console"/>
+  </logger>
+  <root level="error">
+    <appender-ref ref="Console"/>
+  </root>
+</configuration>
