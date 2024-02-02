@@ -140,7 +140,7 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
     private void buildDeployEnv(List<String> scripts, UUID uuid) {
         String workspace = executor.getModuleFullPath(uuid.toString());
         buildWorkspace(workspace);
-        buildScriptFiles(workspace, scripts);
+        buildScriptFiles(workspace, uuid, scripts);
     }
 
     private void buildDestroyEnv(List<String> scripts, String tfState, UUID uuid) {
@@ -158,22 +158,24 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         log.info("workspace create success,Working directory is " + ws.getAbsolutePath());
     }
 
-    private void buildScriptFiles(String workspace, List<String> scripts) {
+    private void buildScriptFiles(String workspace, UUID uuid, List<String> scripts) {
         log.info("start build OpenTofu script");
         if (CollectionUtils.isEmpty(scripts)) {
             throw new OpenTofuExecutorException("OpenTofu scripts create error, OpenTofu "
                     + "scripts not exists");
         }
+        StringBuilder scriptBuilder = new StringBuilder();
         for (String script : scripts) {
-            String fileName =
-                    workspace + File.separator + UUID.randomUUID() + FILE_SUFFIX;
-            try (FileWriter scriptWriter = new FileWriter(fileName)) {
-                scriptWriter.write(script);
-                log.info("OpenTofu script create success, fileName: {}", fileName);
-            } catch (IOException ex) {
-                log.error("OpenTofu script create failed.", ex);
-                throw new OpenTofuExecutorException("OpenTofu script create failed.", ex);
-            }
+            scriptBuilder.append(script).append(System.lineSeparator());
+        }
+        String fileName = workspace + File.separator + uuid + FILE_SUFFIX;
+        boolean overwrite = new File(fileName).exists();
+        try (FileWriter scriptWriter = new FileWriter(fileName, overwrite)) {
+            scriptWriter.write(scriptBuilder.toString());
+            log.info("OpenTofu script create success, fileName: {}", fileName);
+        } catch (IOException ex) {
+            log.error("OpenTofu script create failed.", ex);
+            throw new OpenTofuExecutorException("OpenTofu script create failed.", ex);
         }
     }
 }

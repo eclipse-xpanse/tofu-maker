@@ -43,7 +43,8 @@ public class OpenTofuScriptsHelper {
                 openTofuExecutor.getModuleFullPath(moduleLocation)
                         + File.separator
                         + STATE_FILE_NAME;
-        try (FileWriter scriptWriter = new FileWriter(fileName)) {
+        boolean overwrite = new File(fileName).exists();
+        try (FileWriter scriptWriter = new FileWriter(fileName, overwrite)) {
             scriptWriter.write(tfState);
             log.info("tfState file create success, fileName: {}", fileName);
         } catch (IOException ex) {
