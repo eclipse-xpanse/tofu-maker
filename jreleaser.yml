@@ -1,0 +1,51 @@
+project:
+  name: eclipse-tofu-maker
+  license: Apache-2.0
+  description: RESTful APIs for executing OpenTofu commands.
+  links:
+    homepage: https://eclipse-xpanse.github.io/xpanse-website/
+    documentation: https://eclipse-xpanse.github.io/xpanse-website/docs/intro
+    contribute: https://eclipse-xpanse.github.io/xpanse-website/docs/Contribute/new-developers
+  icons:
+    - url: https://github.com/eclipse-xpanse/xpanse/blob/main/static/full-logo.png
+      primary: true
+      width: 250
+      height: 250
+  java:
+    version: "21"
+    groupId: "org.eclipse.xpanse.tofu.maker"
+release:
+  github:
+    overwrite: true
+    changelog:
+      format: '- {{commitShortHash}} {{commitTitle}}'
+      skipMergeCommits: true
+      formatted: ALWAYS
+      excludeLabels:
+        - 'botCommits'
+      labelers:
+        - label: 'botCommits'
+          title: 'regex:.*GitHub Action.*'
+        - label: 'dependencies'
+          title: 'regex:(Bump|dependencies).*'
+        - label: 'changes'
+          title: 'regex:^((?!(Bump|dependencies)).)*$'
+      hide:
+        contributors:
+          - eclipse-xpanse-bot
+          - dependabot[bot]
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+      categories:
+        - title: 'Changes'
+          labels:
+            - 'changes'
+        - title: 'Dependencies'
+          labels:
+            - 'dependencies'
+signing:
+  active: ALWAYS
+  armored: true
+files:
+  artifacts:
+    - path: 'target/tofu-maker-{{projectEffectiveVersion}}.jar'

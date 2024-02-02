@@ -1,0 +1,31 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+name: tofu-maker-ci
+
+# Run this workflow every time a new commit push to the repository
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set Up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.6.0
+      - name: Build
+        run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
