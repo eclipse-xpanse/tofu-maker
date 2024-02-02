@@ -39,6 +39,7 @@ import org.eclipse.xpanse.tofu.maker.opentofu.OpenTofuExecutor;
 import org.eclipse.xpanse.tofu.maker.opentofu.utils.SystemCmdResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -63,6 +64,9 @@ public class OpenTofuDirectoryService {
 
     private final OpenTofuExecutor executor;
     private final RestTemplate restTemplate;
+
+    @Value("${deployment.clean.workspace.enabled:true}")
+    private Boolean cleanWorkspaceAfterDeployment;
 
     @Autowired
     public OpenTofuDirectoryService(OpenTofuExecutor executor, RestTemplate restTemplate) {
@@ -138,9 +142,11 @@ public class OpenTofuDirectoryService {
             result.setCommandStdError(tfEx.getMessage());
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
-        OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(
-                result, workspace, null);
-        deleteWorkspace(workspace);
+        OpenTofuResult openTofuResult =
+                transSystemCmdResultToOpenTofuResult(result, workspace, null);
+        if (cleanWorkspaceAfterDeployment) {
+            deleteWorkspace(workspace);
+        }
         return openTofuResult;
     }
 
