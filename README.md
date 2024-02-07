@@ -138,8 +138,8 @@ $ java -jar target/tofu-maker-*.jar
 API can be accessed using the following URLs
 
 ```html
-http://localhost:9090
-http://localhost:9090/swagger-ui/index.html
+http://localhost:9092
+http://localhost:9092/swagger-ui/index.html
 ```
 
 ### Production
