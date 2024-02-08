@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.tofu.maker.async.TaskConfiguration;
 import org.eclipse.xpanse.tofu.maker.models.OpenTofuMakerSystemStatus;
@@ -217,6 +218,7 @@ public class OpenTofuDirectoryService {
             result = destroyFromDirectory(request, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
+                    .destroyScenario(request.getDestroyScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -284,9 +286,8 @@ public class OpenTofuDirectoryService {
 
     private void deleteWorkspace(String workspace) {
         Path path = Paths.get(workspace);
-        try {
-            Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                    .forEach(File::delete);
+        try (Stream<Path> pathStream = Files.walk(path)) {
+            pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
