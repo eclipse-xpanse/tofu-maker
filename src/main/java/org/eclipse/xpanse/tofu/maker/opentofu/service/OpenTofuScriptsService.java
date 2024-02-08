@@ -124,6 +124,7 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
             result = destroyWithScripts(request, uuid);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
+                    .destroyScenario(request.getDestroyScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)

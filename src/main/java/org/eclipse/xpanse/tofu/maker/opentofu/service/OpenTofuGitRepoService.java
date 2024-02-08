@@ -6,12 +6,20 @@
 package org.eclipse.xpanse.tofu.maker.opentofu.service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.xpanse.tofu.maker.async.TaskConfiguration;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuExecutorException;
@@ -36,6 +44,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
 
+    private static final int MAX_RETRY_COUNT = 5;
     private final RestTemplate restTemplate;
     private final OpenTofuExecutor executor;
     private final OpenTofuScriptsHelper openTofuScriptsHelper;
@@ -66,7 +75,8 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
      * Method to get openTofu plan.
      */
     public OpenTofuPlan getOpenTofuPlanFromGitRepo(OpenTofuPlanFromGitRepoRequest request,
-                                                    UUID uuid) {
+                                                   UUID uuid) {
+        uuid = getUuidToCreateEmptyWorkspace(uuid);
         buildDeployEnv(request.getGitRepoDetails(), uuid);
         return getOpenTofuPlanFromDirectory(request,
                 getScriptsLocationInRepo(request.getGitRepoDetails(), uuid));
@@ -76,6 +86,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
      * Method of deployment a service using a script.
      */
     public OpenTofuResult deployFromGitRepo(OpenTofuDeployFromGitRepoRequest request, UUID uuid) {
+        uuid = getUuidToCreateEmptyWorkspace(uuid);
         buildDeployEnv(request.getGitRepoDetails(), uuid);
         return deployFromDirectory(request, getScriptsLocationInRepo(
                 request.getGitRepoDetails(), uuid));
@@ -86,6 +97,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
      */
     public OpenTofuResult destroyFromGitRepo(OpenTofuDestroyFromGitRepoRequest request,
                                              UUID uuid) {
+        uuid = getUuidToCreateEmptyWorkspace(uuid);
         buildDestroyEnv(request.getGitRepoDetails(), request.getTfState(), uuid);
         return destroyFromDirectory(request, getScriptsLocationInRepo(
                 request.getGitRepoDetails(), uuid));
@@ -125,6 +137,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
             result = destroyFromGitRepo(request, uuid);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
+                    .destroyScenario(request.getDestroyScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -145,6 +158,25 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
         extractScripts(workspace, openTofuScriptGitRepoDetails);
     }
 
+    private void buildDestroyEnv(OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails,
+                                 String tfState, UUID uuid) {
+        buildDeployEnv(openTofuScriptGitRepoDetails, uuid);
+        openTofuScriptsHelper.createTfStateFile(tfState,
+                uuid + File.separator + openTofuScriptGitRepoDetails.getScriptPath());
+    }
+
+    private UUID getUuidToCreateEmptyWorkspace(UUID uuid) {
+        File ws = new File(executor.getModuleFullPath(uuid.toString()));
+        if (ws.exists()) {
+            if (!cleanWorkspace(uuid)) {
+                uuid = UUID.randomUUID();
+                log.info("Clean existed workspace failed. Create empty workspace with id:{}", uuid);
+                return UUID.randomUUID();
+            }
+        }
+        return uuid;
+    }
+
     private void buildWorkspace(String workspace) {
         log.info("start create workspace");
         File ws = new File(workspace);
@@ -156,36 +188,64 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
     }
 
     private void extractScripts(String workspace,
-                                OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails) {
-        log.info("Cloning GIT repo");
-        try {
+                                OpenTofuScriptGitRepoDetails scriptsRepo) {
+        log.info("Cloning scripts from GIT repo:{} to workspace:{}", scriptsRepo.getRepoUrl(),
+                workspace);
+        File workspaceDirectory = new File(workspace);
+        FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
+        repositoryBuilder.findGitDir(workspaceDirectory);
+        if (Objects.isNull(repositoryBuilder.getGitDir())) {
             CloneCommand cloneCommand = new CloneCommand();
-            cloneCommand.setURI(openTofuScriptGitRepoDetails.getRepoUrl());
+            cloneCommand.setURI(scriptsRepo.getRepoUrl());
             cloneCommand.setProgressMonitor(null);
-            cloneCommand.setDirectory(new File(workspace));
-            cloneCommand.setBranch(openTofuScriptGitRepoDetails.getBranch());
-            cloneCommand.call();
-        } catch (GitAPIException e) {
-            log.error(e.getMessage(), e);
-            throw new GitRepoCloneException(e.getMessage());
+            cloneCommand.setDirectory(workspaceDirectory);
+            cloneCommand.setBranch(scriptsRepo.getBranch());
+            boolean cloneSuccess = false;
+            int retryCount = 0;
+            String errMsg = "";
+            while (!cloneSuccess && retryCount < MAX_RETRY_COUNT) {
+                try {
+                    cloneCommand.call();
+                    cloneSuccess = true;
+                } catch (GitAPIException e) {
+                    retryCount++;
+                    errMsg =
+                            String.format("Cloning scripts form GIT repo error:%s", e.getMessage());
+                    log.error(errMsg);
+                }
+            }
+            if (!cloneSuccess) {
+                throw new GitRepoCloneException(errMsg);
+            }
         }
-    }
-
-    private void buildDestroyEnv(OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails,
-                                 String tfState, UUID uuid) {
-        buildDeployEnv(openTofuScriptGitRepoDetails, uuid);
-        openTofuScriptsHelper.createTfStateFile(tfState,
-                uuid + File.separator + openTofuScriptGitRepoDetails.getScriptPath());
     }
 
     private String getScriptsLocationInRepo(
             OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails,
             UUID uuid) {
-        if (Objects.nonNull(openTofuScriptGitRepoDetails.getScriptPath())) {
+        if (StringUtils.isNotBlank(openTofuScriptGitRepoDetails.getScriptPath())) {
             return uuid + File.separator + openTofuScriptGitRepoDetails.getScriptPath();
         }
         return uuid.toString();
     }
 
+    private boolean cleanWorkspace(UUID uuid) {
+        boolean cleanSuccess = true;
+        try {
+            String workspace = executor.getModuleFullPath(uuid.toString());
+            Path path = Paths.get(workspace).toAbsolutePath().normalize();
+            List<File> files =
+                    Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).toList();
+            for (File file : files) {
+                if (!file.delete()) {
+                    cleanSuccess = false;
+                    log.info("Failed to delete file: {}", file.getAbsolutePath());
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return cleanSuccess;
+    }
 
 }
