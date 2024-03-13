@@ -20,7 +20,7 @@
 	<description>RESTful API Wrapper for OpenTofu</description>
 	<properties>
 		<java.version>21</java.version>
-		<springdoc.version>2.3.0</springdoc.version>
+		<springdoc.version>2.4.0</springdoc.version>
 		<checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
 		<logbook.version>3.7.2</logbook.version>
 		<nimbusds.oidc.sdk.version>11.10.1</nimbusds.oidc.sdk.version>
