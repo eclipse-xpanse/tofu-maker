@@ -16,8 +16,10 @@ import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlan;
 import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlanFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncModifyFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuModifyFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuDirectoryService;
@@ -102,6 +104,30 @@ public class OpenTofuMakerFromDirectoryApi {
     }
 
     /**
+     * Method to modify resources requested in a workspace.
+     *
+     * @return Returns the status of the deployment.
+     */
+    @Tag(name = "OpenTofuFromDirectory", description =
+            "APIs for running OpenTofu commands inside a provided directory.")
+    @Operation(description = "Modify resources via OpenTofu from the given directory.")
+    @PostMapping(value = "/modify/{module_directory}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public OpenTofuResult modifyFromDirectory(
+            @Parameter(name = "module_directory",
+                    description = "directory name where the OpenTofu module files exist.")
+            @PathVariable("module_directory") String moduleDirectory,
+            @Valid @RequestBody
+                    OpenTofuModifyFromDirectoryRequest request,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        return openTofuDirectoryService.modifyFromDirectory(request, moduleDirectory);
+    }
+
+    /**
      * Method to destroy resources requested in a workspace.
      *
      * @return Returns the status of the resources destroy.
@@ -171,6 +197,28 @@ public class OpenTofuMakerFromDirectoryApi {
         }
         MDC.put("TASK_ID", uuid.toString());
         openTofuDirectoryService.asyncDeployWithScripts(asyncDeployRequest, moduleDirectory);
+    }
+
+    /**
+     * Method to async modify resources from the given directory.
+     */
+    @Tag(name = "OpenTofuFromDirectory", description =
+            "APIs for running OpenTofu commands inside a provided directory.")
+    @Operation(description = "async modify resources via OpenTofu from the given directory.")
+    @PostMapping(value = "/modify/async/{module_directory}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void asyncModifyFromDirectory(
+            @Parameter(name = "module_directory",
+                    description = "directory name where the OpenTofu module files exist.")
+            @PathVariable("module_directory") String moduleDirectory,
+            @Valid @RequestBody OpenTofuAsyncModifyFromDirectoryRequest asyncModifyRequest,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        openTofuDirectoryService.asyncModifyWithScripts(asyncModifyRequest, moduleDirectory);
     }
 
     /**

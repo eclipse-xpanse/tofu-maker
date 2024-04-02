@@ -15,8 +15,10 @@ import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlan;
 import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlanFromGitRepoRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuAsyncDeployFromGitRepoRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuAsyncDestroyFromGitRepoRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuAsyncModifyFromGitRepoRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuDeployFromGitRepoRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuDestroyFromGitRepoRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuModifyFromGitRepoRequest;
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuGitRepoService;
@@ -111,6 +113,27 @@ public class OpenTofuMakerFromGitRepoApi {
     }
 
     /**
+     * Method to modify resources using scripts from the GIT Repo provided.
+     *
+     * @return Returns the status of the deployment.
+     */
+    @Tag(name = "OpenTofuFromGitRepo", description =
+            "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
+    @Operation(description = "Modify resources via OpenTofu")
+    @PostMapping(value = "/modify", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public OpenTofuResult modifyFromGitRepo(
+            @Valid @RequestBody OpenTofuModifyFromGitRepoRequest request,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        return openTofuGitRepoService.modifyFromGitRepo(request, uuid);
+    }
+
+    /**
      * MMethod to deploy resources using scripts from the GIT Repo provided.
      *
      * @return Returns the status of to Destroy.
@@ -148,6 +171,25 @@ public class OpenTofuMakerFromGitRepoApi {
         }
         MDC.put("TASK_ID", uuid.toString());
         openTofuGitRepoService.asyncDeployFromGitRepo(asyncDeployRequest, uuid);
+    }
+
+    /**
+     * Method to async modify resources from the provided GIT Repo.
+     */
+    @Tag(name = "OpenTofuFromGitRepo", description =
+            "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
+    @Operation(description = "async modify resources via OpenTofu")
+    @PostMapping(value = "/modify/async", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void asyncModifyFromGitRepo(
+            @Valid @RequestBody OpenTofuAsyncModifyFromGitRepoRequest asyncModifyRequest,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        openTofuGitRepoService.asyncModifyFromGitRepo(asyncModifyRequest, uuid);
     }
 
     /**

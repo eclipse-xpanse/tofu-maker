@@ -13,10 +13,10 @@ import lombok.Data;
 import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 
 /**
- * Data model for the OpenTofu deploy requests.
+ * Data model for the OpenTofu modify requests.
  */
 @Data
-public class OpenTofuDeployFromDirectoryRequest {
+public class OpenTofuModifyFromDirectoryRequest {
 
     @NotNull
     @Schema(description = "Flag to control if the deployment must only generate the OpenTofu "

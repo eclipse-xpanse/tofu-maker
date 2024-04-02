@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
-import org.eclipse.xpanse.tofu.maker.models.enums.DestroyScenario;
+import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 
 /**
  * Data model for the OpenTofu destroy requests.
@@ -20,9 +20,11 @@ import org.eclipse.xpanse.tofu.maker.models.enums.DestroyScenario;
 @Data
 public class OpenTofuDestroyFromDirectoryRequest {
 
-    @Schema(description = "The destroy scenario when the Xpanse client send the destroy request. "
-            + "Valid values: destroy,rollback,purge.")
-    DestroyScenario destroyScenario;
+    @Schema(description = "This value can be set by the client if they wish to know the type of"
+            + "request for which the callback response is generated from tofu-maker. There will be"
+            + "no difference in the way request is executed. This information is only set in the"
+            + "callback response again for the client to handle the callback response accordingly.")
+    DeploymentScenario deploymentScenario;
 
     @NotNull
     @Schema(description = "Key-value pairs of regular variables that must be used to execute the "

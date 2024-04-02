@@ -11,35 +11,37 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.UnsupportedEnumValueException;
 
 /**
- * Destroy Scenario. The destroy scenario is used to set into OpenTofuResult and sent back to the
- * client which sent the destroy request in what scenario.
+ * The deployment scenario is used to set into OpenTofuResult and sent back to the
+ * client which sent the deployment request in what scenario.
  */
-public enum DestroyScenario {
+public enum DeploymentScenario {
+    DEPLOY("deploy"),
+    MODIFY("modify"),
     DESTROY("destroy"),
     ROLLBACK("rollback"),
     PURGE("purge");
     private final String scenario;
 
-    DestroyScenario(String scenario) {
+    DeploymentScenario(String scenario) {
         this.scenario = scenario;
     }
 
     /**
-     * For DestroyScenario deserialize.
+     * For DeploymentScenario deserialize.
      */
     @JsonCreator
-    public static DestroyScenario getByValue(String scenario) {
-        for (DestroyScenario destroyScenario : values()) {
-            if (StringUtils.equalsIgnoreCase(destroyScenario.scenario, scenario)) {
-                return destroyScenario;
+    public static DeploymentScenario getByValue(String scenario) {
+        for (DeploymentScenario deploymentScenario : values()) {
+            if (StringUtils.equalsIgnoreCase(deploymentScenario.scenario, scenario)) {
+                return deploymentScenario;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("DestroyScenario value %s is not supported.", scenario));
+                String.format("DeploymentScenario value %s is not supported.", scenario));
     }
 
     /**
-     * For DestroyScenario serialize.
+     * For DeploymentScenario serialize.
      */
     @JsonValue
     public String toValue() {
