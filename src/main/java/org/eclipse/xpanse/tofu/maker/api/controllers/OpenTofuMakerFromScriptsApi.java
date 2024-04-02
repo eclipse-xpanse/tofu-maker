@@ -15,8 +15,10 @@ import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlan;
 import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlanWithScriptsRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuAsyncDeployFromScriptsRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuAsyncModifyFromScriptsRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuDeployWithScriptsRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuDestroyWithScriptsRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.scripts.OpenTofuModifyWithScriptsRequest;
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuScriptsService;
@@ -90,6 +92,28 @@ public class OpenTofuMakerFromScriptsApi {
     }
 
     /**
+     * Method to modify resources by scripts.
+     *
+     * @return Returns the status of to Modify.
+     */
+    @Tag(name = "OpenTofuFromScripts", description =
+            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Operation(description = "Modify resources via OpenTofu")
+    @PostMapping(value = "/modify", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public OpenTofuResult modifyWithScripts(
+            @Valid @RequestBody OpenTofuModifyWithScriptsRequest request,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        return openTofuScriptsService.modifyWithScripts(request, uuid);
+    }
+
+
+    /**
      * Method to destroy resources by scripts.
      *
      * @return Returns the status of to Destroy.
@@ -127,6 +151,25 @@ public class OpenTofuMakerFromScriptsApi {
         }
         MDC.put("TASK_ID", uuid.toString());
         openTofuScriptsService.asyncDeployWithScripts(asyncDeployRequest, uuid);
+    }
+
+    /**
+     * Method to async modify resources by scripts.
+     */
+    @Tag(name = "OpenTofuFromScripts", description =
+            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Operation(description = "async modify resources via OpenTofu")
+    @PostMapping(value = "/modify/async", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void asyncModifyWithScripts(
+            @Valid @RequestBody OpenTofuAsyncModifyFromScriptsRequest asyncModifyRequest,
+            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
+        if (Objects.isNull(uuid)) {
+            uuid = UUID.randomUUID();
+        }
+        MDC.put("TASK_ID", uuid.toString());
+        openTofuScriptsService.asyncModifyWithScripts(asyncModifyRequest, uuid);
     }
 
     /**

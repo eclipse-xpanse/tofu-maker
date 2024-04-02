@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.tofu.maker.async.TaskConfiguration;
 import org.eclipse.xpanse.tofu.maker.models.OpenTofuMakerSystemStatus;
-import org.eclipse.xpanse.tofu.maker.models.enums.DestroyScenario;
+import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 import org.eclipse.xpanse.tofu.maker.models.enums.HealthStatus;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuHealthCheckException;
@@ -32,8 +32,10 @@ import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlan;
 import org.eclipse.xpanse.tofu.maker.models.plan.OpenTofuPlanFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuAsyncModifyFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuModifyFromDirectoryRequest;
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.OpenTofuExecutor;
@@ -144,7 +146,38 @@ public class OpenTofuDirectoryService {
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult =
-                transSystemCmdResultToOpenTofuResult(result, workspace, null);
+                transSystemCmdResultToOpenTofuResult(result, workspace,
+                        request.getDeploymentScenario());
+        if (cleanWorkspaceAfterDeployment) {
+            deleteWorkspace(workspace);
+        }
+        return openTofuResult;
+    }
+
+    /**
+     * Modify a source by openTofu.
+     */
+    public OpenTofuResult modifyFromDirectory(OpenTofuModifyFromDirectoryRequest request,
+                                              String moduleDirectory) {
+        SystemCmdResult result;
+        try {
+            if (Boolean.TRUE.equals(request.getIsPlanOnly())) {
+                result = executor.tfPlan(request.getVariables(), request.getEnvVariables(),
+                        moduleDirectory);
+            } else {
+                result = executor.tfApply(request.getVariables(), request.getEnvVariables(),
+                        moduleDirectory);
+            }
+        } catch (OpenTofuExecutorException tfEx) {
+            log.error("OpenTofu modify service failed. error:{}", tfEx.getMessage());
+            result = new SystemCmdResult();
+            result.setCommandSuccessful(false);
+            result.setCommandStdError(tfEx.getMessage());
+        }
+        String workspace = executor.getModuleFullPath(moduleDirectory);
+        OpenTofuResult openTofuResult =
+                transSystemCmdResultToOpenTofuResult(result, workspace,
+                        request.getDeploymentScenario());
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
@@ -168,7 +201,7 @@ public class OpenTofuDirectoryService {
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(
-                result, workspace, request.getDestroyScenario());
+                result, workspace, request.getDeploymentScenario());
         deleteWorkspace(workspace);
         return openTofuResult;
     }
@@ -195,6 +228,7 @@ public class OpenTofuDirectoryService {
             result = deployFromDirectory(asyncDeployRequest, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
+                    .deploymentScenario(asyncDeployRequest.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -204,6 +238,30 @@ public class OpenTofuDirectoryService {
         }
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
         log.info("Deployment service complete, callback POST url:{}, requestBody:{}", url, result);
+        restTemplate.postForLocation(url, result);
+    }
+
+    /**
+     * Async modify a source by openTofu.
+     */
+    @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
+    public void asyncModifyWithScripts(
+            OpenTofuAsyncModifyFromDirectoryRequest asyncModifyRequest, String moduleDirectory) {
+        OpenTofuResult result;
+        try {
+            result = modifyFromDirectory(asyncModifyRequest, moduleDirectory);
+        } catch (RuntimeException e) {
+            result = OpenTofuResult.builder()
+                    .deploymentScenario(asyncModifyRequest.getDeploymentScenario())
+                    .commandStdOutput(null)
+                    .commandStdError(e.getMessage())
+                    .isCommandSuccessful(false)
+                    .terraformState(null)
+                    .importantFileContentMap(new HashMap<>())
+                    .build();
+        }
+        String url = asyncModifyRequest.getWebhookConfig().getUrl();
+        log.info("Modify service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
     }
 
@@ -218,7 +276,7 @@ public class OpenTofuDirectoryService {
             result = destroyFromDirectory(request, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .destroyScenario(request.getDestroyScenario())
+                    .deploymentScenario(request.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -234,10 +292,11 @@ public class OpenTofuDirectoryService {
 
     private OpenTofuResult transSystemCmdResultToOpenTofuResult(SystemCmdResult result,
                                                                 String workspace,
-                                                                DestroyScenario destroyScenario) {
+                                                                DeploymentScenario
+                                                                        deploymentScenario) {
         OpenTofuResult openTofuResult = OpenTofuResult.builder().build();
         BeanUtils.copyProperties(result, openTofuResult);
-        openTofuResult.setDestroyScenario(destroyScenario);
+        openTofuResult.setDeploymentScenario(deploymentScenario);
         openTofuResult.setTerraformState(getTerraformState(workspace));
         openTofuResult.setImportantFileContentMap(getImportantFilesContent(workspace));
         return openTofuResult;
