@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.tofu.maker.async.TaskConfiguration;
 import org.eclipse.xpanse.tofu.maker.models.OpenTofuMakerSystemStatus;
-import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 import org.eclipse.xpanse.tofu.maker.models.enums.HealthStatus;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuHealthCheckException;
@@ -145,9 +144,7 @@ public class OpenTofuDirectoryService {
             result.setCommandStdError(tfEx.getMessage());
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
-        OpenTofuResult openTofuResult =
-                transSystemCmdResultToOpenTofuResult(result, workspace,
-                        request.getDeploymentScenario());
+        OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(result, workspace);
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
@@ -176,8 +173,7 @@ public class OpenTofuDirectoryService {
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult =
-                transSystemCmdResultToOpenTofuResult(result, workspace,
-                        request.getDeploymentScenario());
+                transSystemCmdResultToOpenTofuResult(result, workspace);
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
@@ -200,8 +196,7 @@ public class OpenTofuDirectoryService {
             result.setCommandStdError(tfEx.getMessage());
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
-        OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(
-                result, workspace, request.getDeploymentScenario());
+        OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(result, workspace);
         deleteWorkspace(workspace);
         return openTofuResult;
     }
@@ -228,7 +223,6 @@ public class OpenTofuDirectoryService {
             result = deployFromDirectory(asyncDeployRequest, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(asyncDeployRequest.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -252,7 +246,6 @@ public class OpenTofuDirectoryService {
             result = modifyFromDirectory(asyncModifyRequest, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(asyncModifyRequest.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -276,7 +269,6 @@ public class OpenTofuDirectoryService {
             result = destroyFromDirectory(request, moduleDirectory);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(request.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -291,12 +283,9 @@ public class OpenTofuDirectoryService {
     }
 
     private OpenTofuResult transSystemCmdResultToOpenTofuResult(SystemCmdResult result,
-                                                                String workspace,
-                                                                DeploymentScenario
-                                                                        deploymentScenario) {
+                                                                String workspace) {
         OpenTofuResult openTofuResult = OpenTofuResult.builder().build();
         BeanUtils.copyProperties(result, openTofuResult);
-        openTofuResult.setDeploymentScenario(deploymentScenario);
         openTofuResult.setTerraformState(getTerraformState(workspace));
         openTofuResult.setImportantFileContentMap(getImportantFilesContent(workspace));
         return openTofuResult;
