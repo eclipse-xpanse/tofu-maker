@@ -111,7 +111,6 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
             result = deployWithScripts(asyncDeployRequest, uuid);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(asyncDeployRequest.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -135,7 +134,6 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
             result = modifyWithScripts(asyncModifyRequest, uuid);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(asyncModifyRequest.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)
@@ -159,7 +157,6 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
             result = destroyWithScripts(request, uuid);
         } catch (RuntimeException e) {
             result = OpenTofuResult.builder()
-                    .deploymentScenario(request.getDeploymentScenario())
                     .commandStdOutput(null)
                     .commandStdError(e.getMessage())
                     .isCommandSuccessful(false)

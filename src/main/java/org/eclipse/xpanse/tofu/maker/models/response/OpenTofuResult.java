@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
-import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 
 /**
  * Data model for the OpenTofu command execution results.
@@ -19,13 +18,8 @@ import org.eclipse.xpanse.tofu.maker.models.enums.DeploymentScenario;
 @Builder
 public class OpenTofuResult {
 
-    @Schema(description = "This value can be set by the client if they wish to know the type of"
-            + "request for which the callback response is generated from tofu-maker. There will be"
-            + "no difference in the way request is executed. This information is only set in the"
-            + "callback response again for the client to handle the callback response accordingly.")
-    private DeploymentScenario deploymentScenario;
-    @Schema(description = "defines if the command was successfully executed")
     @NotNull
+    @Schema(description = "defines if the command was successfully executed")
     private boolean isCommandSuccessful;
     @Schema(description = "stdout of the command returned as string.")
     private String commandStdOutput;
