@@ -8,6 +8,7 @@ package org.eclipse.xpanse.tofu.maker.models.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +19,8 @@ import lombok.Data;
 @Builder
 public class OpenTofuResult {
 
+    @Schema(description = "Id of the request.")
+    private UUID requestId;
     @NotNull
     @Schema(description = "defines if the command was successfully executed")
     private boolean isCommandSuccessful;

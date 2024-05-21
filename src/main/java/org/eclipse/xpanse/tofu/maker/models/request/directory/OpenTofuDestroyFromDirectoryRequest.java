@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.Data;
 
 /**
@@ -18,6 +19,9 @@ import lombok.Data;
  */
 @Data
 public class OpenTofuDestroyFromDirectoryRequest {
+
+    @Schema(description = "Id of the request.")
+    UUID requestId;
 
     @NotNull
     @Schema(description = "Key-value pairs of regular variables that must be used to execute the "

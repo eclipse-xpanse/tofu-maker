@@ -148,6 +148,7 @@ public class OpenTofuDirectoryService {
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
+        openTofuResult.setRequestId(request.getRequestId());
         return openTofuResult;
     }
 
@@ -177,6 +178,7 @@ public class OpenTofuDirectoryService {
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
+        openTofuResult.setRequestId(request.getRequestId());
         return openTofuResult;
     }
 
@@ -198,6 +200,7 @@ public class OpenTofuDirectoryService {
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(result, workspace);
         deleteWorkspace(workspace);
+        openTofuResult.setRequestId(request.getRequestId());
         return openTofuResult;
     }
 
@@ -230,6 +233,7 @@ public class OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
+        result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
         log.info("Deployment service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
@@ -253,6 +257,7 @@ public class OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
+        result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
         log.info("Modify service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
@@ -276,7 +281,7 @@ public class OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
-
+        result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
         log.info("Destroy service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
