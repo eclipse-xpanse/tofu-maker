@@ -50,16 +50,19 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
     private final RestTemplate restTemplate;
     private final OpenTofuExecutor executor;
     private final OpenTofuScriptsHelper openTofuScriptsHelper;
+    private final ScriptsGitRepoManage scriptsGitRepoManage;
 
     /**
      * Constructor for OpenTofuGitRepoService bean.
      */
     public OpenTofuGitRepoService(OpenTofuExecutor executor, RestTemplate restTemplate,
-                                  OpenTofuScriptsHelper openTofuScriptsHelper) {
+                                  OpenTofuScriptsHelper openTofuScriptsHelper,
+                                  ScriptsGitRepoManage scriptsGitRepoManage) {
         super(executor, restTemplate);
         this.restTemplate = restTemplate;
         this.executor = executor;
         this.openTofuScriptsHelper = openTofuScriptsHelper;
+        this.scriptsGitRepoManage = scriptsGitRepoManage;
     }
 
     /**
@@ -133,6 +136,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
+        result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
         log.info("Deployment service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
@@ -156,6 +160,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
+        result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
         log.info("Modify service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
@@ -179,7 +184,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
                     .importantFileContentMap(new HashMap<>())
                     .build();
         }
-
+        result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
         log.info("Destroy service complete, callback POST url:{}, requestBody:{}", url, result);
         restTemplate.postForLocation(url, result);
@@ -189,7 +194,7 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
                                 UUID uuid) {
         String workspace = executor.getModuleFullPath(uuid.toString());
         buildWorkspace(workspace);
-        extractScripts(workspace, openTofuScriptGitRepoDetails);
+        scriptsGitRepoManage.checkoutScripts(workspace, openTofuScriptGitRepoDetails);
     }
 
     private void buildModifyEnv(OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails,

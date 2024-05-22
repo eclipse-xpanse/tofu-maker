@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.tofu.maker.api.controllers;
 
+import static org.eclipse.xpanse.tofu.maker.logging.CustomRequestIdGenerator.REQUEST_ID;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,12 +62,11 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuValidationResult validateWithScripts(
-            @Valid @RequestBody OpenTofuDeployWithScriptsRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDeployWithScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuScriptsService.validateWithScripts(request);
     }
 
@@ -82,12 +82,11 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult deployWithScripts(
-            @Valid @RequestBody OpenTofuDeployWithScriptsRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDeployWithScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuScriptsService.deployWithScripts(request, uuid);
     }
 
@@ -103,12 +102,11 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult modifyWithScripts(
-            @Valid @RequestBody OpenTofuModifyWithScriptsRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuModifyWithScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuScriptsService.modifyWithScripts(request, uuid);
     }
 
@@ -125,12 +123,11 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult destroyWithScripts(
-            @Valid @RequestBody OpenTofuDestroyWithScriptsRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDestroyWithScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuScriptsService.destroyWithScripts(request, uuid);
     }
 
@@ -144,13 +141,12 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDeployWithScripts(
-            @Valid @RequestBody OpenTofuAsyncDeployFromScriptsRequest asyncDeployRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuScriptsService.asyncDeployWithScripts(asyncDeployRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncDeployFromScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuScriptsService.asyncDeployWithScripts(request, uuid);
     }
 
     /**
@@ -163,13 +159,12 @@ public class OpenTofuMakerFromScriptsApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncModifyWithScripts(
-            @Valid @RequestBody OpenTofuAsyncModifyFromScriptsRequest asyncModifyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuScriptsService.asyncModifyWithScripts(asyncModifyRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncModifyFromScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuScriptsService.asyncModifyWithScripts(request, uuid);
     }
 
     /**
@@ -182,13 +177,12 @@ public class OpenTofuMakerFromScriptsApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDestroyWithScripts(
-            @Valid @RequestBody OpenTofuAsyncDestroyFromScriptsRequest asyncDestroyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuScriptsService.asyncDestroyWithScripts(asyncDestroyRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncDestroyFromScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuScriptsService.asyncDestroyWithScripts(request, uuid);
     }
 
     /**
@@ -203,12 +197,11 @@ public class OpenTofuMakerFromScriptsApi {
     @PostMapping(value = "/plan", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuPlan planWithScripts(
-            @Valid @RequestBody OpenTofuPlanWithScriptsRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuPlanWithScriptsRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuScriptsService.getOpenTofuPlanFromScripts(request, uuid);
     }
 }

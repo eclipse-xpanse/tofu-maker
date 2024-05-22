@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.tofu.maker.api.controllers;
 
+import static org.eclipse.xpanse.tofu.maker.logging.CustomRequestIdGenerator.REQUEST_ID;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,16 +58,14 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "Deploy resources via OpenTofu")
-    @PostMapping(value = "/validate", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/validate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuValidationResult validateScriptsFromGitRepo(
-            @Valid @RequestBody OpenTofuDeployFromGitRepoRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDeployFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuGitRepoService.validateWithScripts(request);
     }
 
@@ -82,12 +81,11 @@ public class OpenTofuMakerFromGitRepoApi {
     @PostMapping(value = "/plan", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuPlan planFromGitRepo(
-            @Valid @RequestBody OpenTofuPlanFromGitRepoRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuPlanFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuGitRepoService.getOpenTofuPlanFromGitRepo(request, uuid);
     }
 
@@ -99,16 +97,14 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "Deploy resources via OpenTofu")
-    @PostMapping(value = "/deploy", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/deploy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult deployFromGitRepo(
-            @Valid @RequestBody OpenTofuDeployFromGitRepoRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDeployFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuGitRepoService.deployFromGitRepo(request, uuid);
     }
 
@@ -120,16 +116,14 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "Modify resources via OpenTofu")
-    @PostMapping(value = "/modify", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult modifyFromGitRepo(
-            @Valid @RequestBody OpenTofuModifyFromGitRepoRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuModifyFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuGitRepoService.modifyFromGitRepo(request, uuid);
     }
 
@@ -141,16 +135,14 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "Destroy resources via OpenTofu")
-    @PostMapping(value = "/destroy", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/destroy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult destroyFromGitRepo(
-            @Valid @RequestBody OpenTofuDestroyFromGitRepoRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDestroyFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuGitRepoService.destroyFromGitRepo(request, uuid);
     }
 
@@ -160,17 +152,15 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "async deploy resources via OpenTofu")
-    @PostMapping(value = "/deploy/async", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/deploy/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDeployFromGitRepo(
-            @Valid @RequestBody OpenTofuAsyncDeployFromGitRepoRequest asyncDeployRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuGitRepoService.asyncDeployFromGitRepo(asyncDeployRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncDeployFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuGitRepoService.asyncDeployFromGitRepo(request, uuid);
     }
 
     /**
@@ -179,17 +169,15 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "async modify resources via OpenTofu")
-    @PostMapping(value = "/modify/async", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/modify/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncModifyFromGitRepo(
-            @Valid @RequestBody OpenTofuAsyncModifyFromGitRepoRequest asyncModifyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuGitRepoService.asyncModifyFromGitRepo(asyncModifyRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncModifyFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuGitRepoService.asyncModifyFromGitRepo(request, uuid);
     }
 
     /**
@@ -198,16 +186,14 @@ public class OpenTofuMakerFromGitRepoApi {
     @Tag(name = "OpenTofuFromGitRepo", description =
             "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo.")
     @Operation(description = "Async destroy the OpenTofu modules")
-    @DeleteMapping(value = "/destroy/async",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/destroy/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDestroyFromGitRepo(
-            @Valid @RequestBody OpenTofuAsyncDestroyFromGitRepoRequest asyncDestroyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuGitRepoService.asyncDestroyFromGitRepo(asyncDestroyRequest, uuid);
+            @Valid @RequestBody OpenTofuAsyncDestroyFromGitRepoRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuGitRepoService.asyncDestroyFromGitRepo(request, uuid);
     }
 }

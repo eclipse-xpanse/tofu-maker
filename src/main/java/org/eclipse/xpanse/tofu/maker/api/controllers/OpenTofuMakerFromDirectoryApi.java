@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.tofu.maker.api.controllers;
 
+import static org.eclipse.xpanse.tofu.maker.logging.CustomRequestIdGenerator.REQUEST_ID;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +36,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,12 +71,9 @@ public class OpenTofuMakerFromDirectoryApi {
     public OpenTofuValidationResult validateFromDirectory(
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @PathVariable("module_directory") String moduleDirectory) {
+        UUID uuid = UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
         return openTofuDirectoryService.tfValidateFromDirectory(moduleDirectory);
     }
 
@@ -93,13 +91,11 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody
-            OpenTofuDeployFromDirectoryRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuDeployFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuDirectoryService.deployFromDirectory(request, moduleDirectory);
     }
 
@@ -117,13 +113,11 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody
-                    OpenTofuModifyFromDirectoryRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuModifyFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuDirectoryService.modifyFromDirectory(request, moduleDirectory);
     }
 
@@ -143,12 +137,11 @@ public class OpenTofuMakerFromDirectoryApi {
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
             @Valid @RequestBody
-            OpenTofuDestroyFromDirectoryRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            OpenTofuDestroyFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuDirectoryService.destroyFromDirectory(request, moduleDirectory);
     }
 
@@ -167,12 +160,11 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody OpenTofuPlanFromDirectoryRequest request,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
+            @Valid @RequestBody OpenTofuPlanFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
         return openTofuDirectoryService.getOpenTofuPlanFromDirectory(request,
                 moduleDirectory);
     }
@@ -190,13 +182,12 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody OpenTofuAsyncDeployFromDirectoryRequest asyncDeployRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuDirectoryService.asyncDeployWithScripts(asyncDeployRequest, moduleDirectory);
+            @Valid @RequestBody OpenTofuAsyncDeployFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuDirectoryService.asyncDeployWithScripts(request, moduleDirectory);
     }
 
     /**
@@ -212,13 +203,12 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody OpenTofuAsyncModifyFromDirectoryRequest asyncModifyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuDirectoryService.asyncModifyWithScripts(asyncModifyRequest, moduleDirectory);
+            @Valid @RequestBody OpenTofuAsyncModifyFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuDirectoryService.asyncModifyWithScripts(request, moduleDirectory);
     }
 
     /**
@@ -234,12 +224,11 @@ public class OpenTofuMakerFromDirectoryApi {
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
             @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody OpenTofuAsyncDestroyFromDirectoryRequest asyncDestroyRequest,
-            @RequestHeader(name = "X-Custom-RequestId", required = false) UUID uuid) {
-        if (Objects.isNull(uuid)) {
-            uuid = UUID.randomUUID();
-        }
-        MDC.put("TASK_ID", uuid.toString());
-        openTofuDirectoryService.asyncDestroyWithScripts(asyncDestroyRequest, moduleDirectory);
+            @Valid @RequestBody OpenTofuAsyncDestroyFromDirectoryRequest request) {
+        UUID uuid = Objects.nonNull(request.getRequestId())
+                ? request.getRequestId() : UUID.randomUUID();
+        MDC.put(REQUEST_ID, uuid.toString());
+        request.setRequestId(uuid);
+        openTofuDirectoryService.asyncDestroyWithScripts(request, moduleDirectory);
     }
 }
