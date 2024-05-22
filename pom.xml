@@ -24,7 +24,7 @@
 		<springdoc.version>2.5.0</springdoc.version>
 		<checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
 		<logbook.version>3.8.0</logbook.version>
-		<nimbusds.oidc.sdk.version>11.11</nimbusds.oidc.sdk.version>
+		<nimbusds.oidc.sdk.version>11.12</nimbusds.oidc.sdk.version>
 		<lombok.version>1.18.30</lombok.version>
 		<opentelemetry.version>1.32.0</opentelemetry.version>
 		<eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
