@@ -321,20 +321,28 @@ public class OpenTofuDirectoryService {
         if (workPath.isDirectory() && workPath.exists()) {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
-                List<File> importantFiles = Arrays.stream(files)
-                        .filter(file -> file.isFile() && !isExcludedFile(file.getName())).toList();
-                for (File importantFile : importantFiles) {
-                    try {
-                        String content = Files.readString(importantFile.toPath());
-                        fileContentMap.put(importantFile.getName(), content);
-                    } catch (IOException e) {
-                        log.error("Read content of file with name:{} error.",
-                                importantFile.getName(), e);
+                Arrays.stream(files).forEach(file -> {
+                    if (file.isFile() && !isExcludedFile(file.getName())) {
+                        String content = readFileContentAndDelete(file);
+                        fileContentMap.put(file.getName(), content);
                     }
-                }
+                });
             }
         }
         return fileContentMap;
+    }
+
+    private String readFileContentAndDelete(File file) {
+        String fileContent = "";
+        try {
+            fileContent = Files.readString(file.toPath());
+            boolean deleted = Files.deleteIfExists(file.toPath());
+            log.info("Read file content with name:{} successfully. Delete result：{}",
+                    file.getName(), deleted);
+        } catch (IOException e) {
+            log.error("Read file content with name:{} error.", file.getName(), e);
+        }
+        return fileContent;
     }
 
     private void deleteWorkspace(String workspace) {
