@@ -17,5 +17,6 @@ import lombok.Data;
 public class OpenTofuValidationResult {
 
     private boolean valid;
+    private String openTofuVersion;
     private List<OpenTofuValidateDiagnostics> diagnostics;
 }

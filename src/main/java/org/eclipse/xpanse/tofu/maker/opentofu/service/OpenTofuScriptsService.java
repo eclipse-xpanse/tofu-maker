@@ -63,7 +63,7 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
             OpenTofuDeployWithScriptsRequest request) {
         UUID uuid = UUID.randomUUID();
         buildDeployEnv(request.getScripts(), uuid);
-        return tfValidateFromDirectory(uuid.toString());
+        return tfValidateFromDirectory(uuid.toString(), request.getOpenTofuVersion());
     }
 
     /**

@@ -29,6 +29,8 @@
 		<opentelemetry.version>1.32.0</opentelemetry.version>
 		<eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
 		<jgit.version>7.0.0.202409031743-r</jgit.version>
+		<semver4j.version>5.4.0</semver4j.version>
+		<github-api.version>1.326</github-api.version>
 		<maven.complier.plugin.version>3.13.0</maven.complier.plugin.version>
 		<maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
 		<maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
@@ -52,7 +54,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -110,6 +119,16 @@
 			<groupId>org.springframework.retry</groupId>
 			<artifactId>spring-retry</artifactId>
 			<version>${spring.retry.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.semver4j</groupId>
+			<artifactId>semver4j</artifactId>
+			<version>${semver4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.kohsuke</groupId>
+			<artifactId>github-api</artifactId>
+			<version>${github-api.version}</version>
 		</dependency>
 	</dependencies>
 

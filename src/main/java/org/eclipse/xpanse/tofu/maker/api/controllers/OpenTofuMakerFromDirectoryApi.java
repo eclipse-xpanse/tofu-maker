@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuModifyFrom
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuDirectoryService;
+import org.eclipse.xpanse.tofu.maker.opentofu.tool.OpenTofuVersionsHelper;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,15 +69,20 @@ public class OpenTofuMakerFromDirectoryApi {
     @Tag(name = "OpenTofuFromDirectory", description =
             "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Validate the OpenTofu modules in the given directory.")
-    @GetMapping(value = "/validate/{module_directory}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/validate/{module_directory}/{opentofu_version}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuValidationResult validateFromDirectory(
             @Parameter(name = "module_directory",
                     description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory) {
+            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(name = "opentofu_version",
+                    description = "version of OpenTofu to execute the module files.")
+            @NotBlank @Pattern(regexp = OpenTofuVersionsHelper.OPENTOFU_REQUIRED_VERSION_REGEX)
+            @PathVariable("opentofu_version") String openTofuVersion) {
         UUID uuid = UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
-        return openTofuDirectoryService.tfValidateFromDirectory(moduleDirectory);
+        return openTofuDirectoryService.tfValidateFromDirectory(moduleDirectory, openTofuVersion);
     }
 
     /**

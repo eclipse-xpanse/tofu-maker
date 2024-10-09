@@ -17,6 +17,7 @@ public enum ResultType {
     BAD_PARAMETERS("Parameters Invalid"),
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
     OPENTOFU_EXECUTION_FAILED("OpenTofu Execution Failed"),
+    INVALID_OPENTOFU_TOOL("Invalid OpenTofu Tool"),
     UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
     SERVICE_UNAVAILABLE("Service Unavailable"),
     UNAUTHORIZED("Unauthorized"),

@@ -21,6 +21,8 @@ public class OpenTofuResult {
 
     @Schema(description = "Id of the request.")
     private UUID requestId;
+    @Schema(description = "The exact version of the OpenTofu which executed the scripts.")
+    String openTofuVersion;
     @NotNull
     @Schema(description = "defines if the command was successfully executed")
     private boolean isCommandSuccessful;
