@@ -130,4 +130,16 @@ public class OpenTofuApiExceptionHandler {
         return Response.errorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
                 Collections.singletonList(failMessage));
     }
+
+    /**
+     * Exception handler for InvalidOpenTofuToolException.
+     */
+    @ExceptionHandler({InvalidOpenTofuToolException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidOpenTofuToolException(
+            InvalidOpenTofuToolException ex) {
+        return Response.errorResponse(ResultType.INVALID_OPENTOFU_TOOL,
+                Collections.singletonList(ex.getMessage()));
+    }
 }

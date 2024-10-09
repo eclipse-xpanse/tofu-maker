@@ -72,8 +72,8 @@ public class OpenTofuGitRepoService extends OpenTofuDirectoryService {
             OpenTofuDeployFromGitRepoRequest request) {
         UUID uuid = UUID.randomUUID();
         buildDeployEnv(request.getGitRepoDetails(), uuid);
-        return tfValidateFromDirectory(
-                getScriptsLocationInRepo(request.getGitRepoDetails(), uuid));
+        return tfValidateFromDirectory(getScriptsLocationInRepo(request.getGitRepoDetails(), uuid),
+                request.getOpenTofuVersion());
     }
 
     /**
