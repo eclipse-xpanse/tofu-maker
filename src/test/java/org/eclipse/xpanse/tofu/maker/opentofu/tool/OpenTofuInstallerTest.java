@@ -5,12 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.annotation.Resource;
+
 import java.io.File;
+
 import org.eclipse.xpanse.tofu.maker.models.exceptions.InvalidOpenTofuToolException;
+import org.eclipse.xpanse.tofu.maker.opentofu.utils.SystemCmd;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = {OpenTofuInstaller.class,
+        OpenTofuVersionsHelper.class,
+        OpenTofuVersionsCache.class,
+        OpenTofuVersionsFetcher.class,
+        SystemCmd.class})
 class OpenTofuInstallerTest {
 
     @Resource
