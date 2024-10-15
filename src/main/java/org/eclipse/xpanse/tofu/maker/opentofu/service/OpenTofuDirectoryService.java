@@ -129,7 +129,7 @@ public class OpenTofuDirectoryService {
             OpenTofuValidationResult validationResult =
                     new ObjectMapper().readValue(result.getCommandStdOutput(),
                             OpenTofuValidationResult.class);
-            validationResult.setOpenTofuVersion(
+            validationResult.setOpenTofuVersionUsed(
                     versionHelper.getExactVersionOfExecutor(executorPath));
             return validationResult;
         } catch (JsonProcessingException ex) {
@@ -164,7 +164,8 @@ public class OpenTofuDirectoryService {
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(result, workspace);
-        openTofuResult.setOpenTofuVersion(versionHelper.getExactVersionOfExecutor(executorPath));
+        openTofuResult.setOpenTofuVersionUsed(
+                versionHelper.getExactVersionOfExecutor(executorPath));
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
@@ -200,7 +201,8 @@ public class OpenTofuDirectoryService {
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult =
                 transSystemCmdResultToOpenTofuResult(result, workspace);
-        openTofuResult.setOpenTofuVersion(versionHelper.getExactVersionOfExecutor(executorPath));
+        openTofuResult.setOpenTofuVersionUsed(
+                versionHelper.getExactVersionOfExecutor(executorPath));
         if (cleanWorkspaceAfterDeployment) {
             deleteWorkspace(workspace);
         }
@@ -228,7 +230,8 @@ public class OpenTofuDirectoryService {
         }
         String workspace = executor.getModuleFullPath(moduleDirectory);
         OpenTofuResult openTofuResult = transSystemCmdResultToOpenTofuResult(result, workspace);
-        openTofuResult.setOpenTofuVersion(versionHelper.getExactVersionOfExecutor(executorPath));
+        openTofuResult.setOpenTofuVersionUsed(
+                versionHelper.getExactVersionOfExecutor(executorPath));
         deleteWorkspace(workspace);
         openTofuResult.setRequestId(request.getRequestId());
         return openTofuResult;
@@ -245,7 +248,8 @@ public class OpenTofuDirectoryService {
                 request.getEnvVariables(), moduleDirectory);
         deleteWorkspace(executor.getModuleFullPath(moduleDirectory));
         OpenTofuPlan openTofuPlan = OpenTofuPlan.builder().plan(result).build();
-        openTofuPlan.setOpenTofuVersion(versionHelper.getExactVersionOfExecutor(executorPath));
+        openTofuPlan.setOpenTofuVersionUsed(
+                versionHelper.getExactVersionOfExecutor(executorPath));
         return openTofuPlan;
     }
 

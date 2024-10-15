@@ -52,7 +52,7 @@ public class OpenTofuInstaller {
                 this.versionHelper.getOperatorAndNumberFromRequiredVersion(requiredVersion);
         String requiredOperator = operatorAndNumber[0];
         String requiredNumber = operatorAndNumber[1];
-        // Get path of the executor matched required version in the environment.
+        // Find executor in the installation path that matches the required version.
         String matchedVersionExecutorPath =
                 this.versionHelper.getExecutorPathMatchedRequiredVersion(
                         this.openTofuInstallDir, requiredOperator, requiredNumber);
@@ -71,9 +71,8 @@ public class OpenTofuInstaller {
                 requiredOperator, requiredNumber);
         File installedExecutorFile = this.versionHelper.installOpenTofuWithVersion(
                 bestVersionNumber, this.openTofuDownloadBaseUrl, this.openTofuInstallDir);
-        if (this.versionHelper.checkIfExecutorVersionIsValid(installedExecutorFile,
-                requiredOperator, requiredNumber)) {
-            log.info("OpenTofu with version {}  installed successfully.", installedExecutorFile);
+        if (this.versionHelper.checkIfExecutorCanBeExecuted(installedExecutorFile)) {
+            log.info("OpenTofu with version {} installed successfully.", installedExecutorFile);
             return installedExecutorFile.getAbsolutePath();
         }
         String errorMsg = String.format("Installing OpenTofu with version %s into the dir %s "

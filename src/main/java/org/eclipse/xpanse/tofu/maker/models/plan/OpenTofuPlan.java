@@ -21,6 +21,6 @@ public class OpenTofuPlan {
     @Schema(description = "OpenTofu plan as a JSON string")
     String plan;
 
-    @Schema(description = "The exact version of the OpenTofu which executed the scripts.")
-    String openTofuVersion;
+    @Schema(description = "The version of the OpenTofu binary used to execute scripts.")
+    String openTofuVersionUsed;
 }
