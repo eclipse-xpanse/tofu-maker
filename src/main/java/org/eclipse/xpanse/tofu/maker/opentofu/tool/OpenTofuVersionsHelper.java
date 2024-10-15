@@ -180,7 +180,7 @@ public class OpenTofuVersionsHelper {
      * @return If true, the executor can be executed, otherwise return false.
      */
     public boolean checkIfExecutorCanBeExecuted(File executorFile) {
-        String versionOutput = getVersionCommandOutput(executorFile);
+        String versionOutput = getVersionCommandOutput(executorFile.getAbsolutePath());
         return StringUtils.isNotBlank(versionOutput);
     }
 
@@ -191,7 +191,7 @@ public class OpenTofuVersionsHelper {
      * @return exact version of executor.
      */
     public String getExactVersionOfExecutor(String executorPath) {
-        String versionOutput = getVersionCommandOutput(new File(executorPath));
+        String versionOutput = getVersionCommandOutput(executorPath);
         Matcher matcher = OPENTOFU_VERSION_OUTPUT_PATTERN.matcher(versionOutput);
         if (matcher.find()) {
             // return only the version number.
@@ -201,12 +201,10 @@ public class OpenTofuVersionsHelper {
     }
 
 
-    private String getVersionCommandOutput(File executorFile) {
+    private String getVersionCommandOutput(String executorPath) {
         try {
-            if (!executorFile.exists() && !executorFile.isFile()) {
-                return null;
-            }
-            if (!executorFile.canExecute()) {
+            File executorFile = new File(executorPath);
+            if (executorFile.exists() && !executorFile.canExecute()) {
                 SystemCmdResult chmodResult = systemCmd.execute(
                         String.format("chmod +x %s", executorFile.getAbsolutePath()),
                         5, System.getProperty("java.io.tmpdir"), false, new HashMap<>());
@@ -215,18 +213,20 @@ public class OpenTofuVersionsHelper {
                 }
             }
             SystemCmdResult versionCheckResult =
-                    systemCmd.execute(executorFile.getAbsolutePath() + " version",
+                    systemCmd.execute(executorPath + " version",
                             5, System.getProperty("java.io.tmpdir"), false, new HashMap<>());
             if (versionCheckResult.isCommandSuccessful()) {
+                log.info("Get version of executor {} output: {}", executorPath,
+                        versionCheckResult.getCommandStdOutput());
                 return versionCheckResult.getCommandStdOutput();
             } else {
-                log.error(versionCheckResult.getCommandStdError());
-                return null;
+                log.error("Get version of executor {} output error: {}", executorPath,
+                        versionCheckResult.getCommandStdError());
             }
         } catch (Exception e) {
-            log.error("Failed to get version of executor {}.", executorFile.getAbsolutePath(), e);
-            return null;
+            log.error("Failed to get version of executor {}.", executorPath, e);
         }
+        return null;
     }
 
 

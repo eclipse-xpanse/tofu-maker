@@ -57,7 +57,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class OpenTofuDirectoryService {
 
-    private static final String STATE_FILE_NAME = "openTofu.tfstate";
+    private static final String STATE_FILE_NAME = "terraform.tfstate";
     private static final String TEST_FILE_NAME = "hello-world.tf";
     private static final String HEALTH_CHECK_DIR = UUID.randomUUID().toString();
     private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
