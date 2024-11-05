@@ -34,6 +34,8 @@ public class OpenTofuVersionsCache {
         try {
             return versionsFetcher.fetchAvailableVersionsFromOpenTofuWebsite();
         } catch (Exception e) {
+            log.error("Failed to fetch versions from website for OpenTofu, get "
+                    + "versions from default config.", e);
             return versionsFetcher.getDefaultVersionsFromConfig();
         }
     }
