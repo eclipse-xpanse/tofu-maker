@@ -10,9 +10,12 @@ import static org.eclipse.xpanse.tofu.maker.logging.CustomRequestIdGenerator.REQ
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +30,9 @@ import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuModifyFrom
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuDirectoryService;
+import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuScriptsHelper;
 import org.eclipse.xpanse.tofu.maker.opentofu.tool.OpenTofuVersionsHelper;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -51,15 +53,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tofu-maker/directory")
 public class OpenTofuMakerFromDirectoryApi {
-
-    private final OpenTofuDirectoryService openTofuDirectoryService;
-
-    @Autowired
-    public OpenTofuMakerFromDirectoryApi(
-            @Qualifier("openTofuDirectoryService")
-            OpenTofuDirectoryService openTofuDirectoryService) {
-        this.openTofuDirectoryService = openTofuDirectoryService;
-    }
+    @Resource
+    private OpenTofuDirectoryService directoryService;
+    @Resource
+    private OpenTofuScriptsHelper scriptsHelper;
 
     /**
      * Method to validate OpenTofu modules.
@@ -82,7 +79,7 @@ public class OpenTofuMakerFromDirectoryApi {
             @PathVariable("opentofu_version") String openTofuVersion) {
         UUID uuid = UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
-        return openTofuDirectoryService.tfValidateFromDirectory(moduleDirectory, openTofuVersion);
+        return directoryService.tfValidateFromDirectory(moduleDirectory, openTofuVersion);
     }
 
     /**
@@ -104,7 +101,8 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        return openTofuDirectoryService.deployFromDirectory(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        return directoryService.deployFromDirectory(request, moduleDirectory, scriptFiles);
     }
 
     /**
@@ -126,7 +124,8 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        return openTofuDirectoryService.modifyFromDirectory(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        return directoryService.modifyFromDirectory(request, moduleDirectory, scriptFiles);
     }
 
     /**
@@ -150,7 +149,8 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        return openTofuDirectoryService.destroyFromDirectory(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        return directoryService.destroyFromDirectory(request, moduleDirectory, scriptFiles);
     }
 
     /**
@@ -173,8 +173,7 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        return openTofuDirectoryService.getOpenTofuPlanFromDirectory(request,
-                moduleDirectory);
+        return directoryService.getOpenTofuPlanFromDirectory(request, moduleDirectory);
     }
 
     /**
@@ -195,7 +194,8 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        openTofuDirectoryService.asyncDeployWithScripts(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        directoryService.asyncDeployWithScripts(request, moduleDirectory, scriptFiles);
     }
 
     /**
@@ -216,7 +216,8 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        openTofuDirectoryService.asyncModifyWithScripts(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        directoryService.asyncModifyWithScripts(request, moduleDirectory, scriptFiles);
     }
 
     /**
@@ -237,6 +238,7 @@ public class OpenTofuMakerFromDirectoryApi {
                 ? request.getRequestId() : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
-        openTofuDirectoryService.asyncDestroyWithScripts(request, moduleDirectory);
+        List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
+        directoryService.asyncDestroyWithScripts(request, moduleDirectory, scriptFiles);
     }
 }

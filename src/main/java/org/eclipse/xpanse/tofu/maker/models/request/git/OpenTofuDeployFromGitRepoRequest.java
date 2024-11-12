@@ -20,5 +20,5 @@ public class OpenTofuDeployFromGitRepoRequest extends OpenTofuDeployFromDirector
 
     @NotNull
     @Schema(description = "GIT Repo details from where the scripts can be fetched.")
-    OpenTofuScriptGitRepoDetails gitRepoDetails;
+    private OpenTofuScriptGitRepoDetails gitRepoDetails;
 }
