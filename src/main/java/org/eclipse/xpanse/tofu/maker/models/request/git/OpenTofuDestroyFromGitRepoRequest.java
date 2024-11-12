@@ -19,7 +19,7 @@ import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFro
 public class OpenTofuDestroyFromGitRepoRequest extends OpenTofuDestroyFromDirectoryRequest {
 
     @Schema(description = "GIT Repo details from where the scripts can be fetched.")
-    OpenTofuScriptGitRepoDetails gitRepoDetails;
+    private OpenTofuScriptGitRepoDetails gitRepoDetails;
 
     @NotNull
     @Schema(description = "The .tfState file content after deployment")

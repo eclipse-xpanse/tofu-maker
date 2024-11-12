@@ -18,5 +18,5 @@ import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuScriptGitRepoDet
 public class OpenTofuPlanFromGitRepoRequest extends OpenTofuPlanFromDirectoryRequest {
 
     @Schema(description = "GIT Repo details from where the scripts can be fetched.")
-    OpenTofuScriptGitRepoDetails gitRepoDetails;
+    private OpenTofuScriptGitRepoDetails gitRepoDetails;
 }

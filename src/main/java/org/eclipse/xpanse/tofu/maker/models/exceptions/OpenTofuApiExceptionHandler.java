@@ -142,4 +142,16 @@ public class OpenTofuApiExceptionHandler {
         return Response.errorResponse(ResultType.INVALID_OPENTOFU_TOOL,
                 Collections.singletonList(ex.getMessage()));
     }
+
+    /**
+     * Exception handler for InvalidOpenTofuScriptsException.
+     */
+    @ExceptionHandler({InvalidOpenTofuScriptsException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidOpenTofuScriptsException(
+            InvalidOpenTofuScriptsException ex) {
+        return Response.errorResponse(ResultType.INVALID_OPENTOFU_SCRIPTS,
+                Collections.singletonList(ex.getMessage()));
+    }
 }

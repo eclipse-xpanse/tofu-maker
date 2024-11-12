@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.tofu.maker.models.validation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -15,6 +16,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenTofuValidateDiagnostics {
 
+    @Schema(description = "Detail of validation error.")
     private String detail;
 
 }

@@ -5,17 +5,23 @@
 
 package org.eclipse.xpanse.tofu.maker.opentofu.service;
 
+import static org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuScriptsHelper.TF_SCRIPT_FILE_EXTENSION;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.xpanse.tofu.maker.models.exceptions.GitRepoCloneException;
+import org.eclipse.xpanse.tofu.maker.models.exceptions.InvalidOpenTofuScriptsException;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuScriptGitRepoDetails;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
@@ -36,7 +42,7 @@ public class ScriptsGitRepoManage {
     @Retryable(retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${spring.retry.max-attempts}",
             backoff = @Backoff(delayExpression = "${spring.retry.delay-millions}"))
-    public void checkoutScripts(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
+    public List<File> checkoutScripts(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
         log.info("Clone GIT repo to get the deployment scripts. Retry number: "
                 + Objects.requireNonNull(RetrySynchronizationManager.getContext()).getRetryCount());
         File workspaceDirectory = new File(workspace);
@@ -60,17 +66,42 @@ public class ScriptsGitRepoManage {
         } else {
             log.info("Scripts repo is already cloned in the workspace.");
         }
+        List<File> files = getSourceFiles(workspace, scriptsRepo);
+        validateIfFolderContainsOpenTofuScripts(files, scriptsRepo);
+        return files;
     }
 
+    private List<File> getSourceFiles(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
+        List<File> sourceFiles = new ArrayList<>();
+        File directory = new File(workspace
+                + (StringUtils.isNotBlank(scriptsRepo.getScriptPath())
+                ? File.separator + scriptsRepo.getScriptPath()
+                : ""));
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (Objects.nonNull(files)) {
+                Arrays.stream(files).forEach(file -> {
+                    if (file.isFile()) {
+                        sourceFiles.add(file);
+                    }
+                });
+            }
+        }
+        return sourceFiles;
+    }
 
-    /**
-     * Recover method for checkoutScripts.
-     *
-     * @param e GitRepoCloneException
-     */
-    @Recover
-    public void recoverCheckoutScripts(GitRepoCloneException e) {
-        log.error("Retry exhausted. Throwing exception: " + e.getMessage());
-        throw e;
+    private void validateIfFolderContainsOpenTofuScripts(
+            List<File> files, OpenTofuScriptGitRepoDetails scriptsRepo) {
+        boolean isScriptsExisted = files.stream()
+                .anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
+        if (!isScriptsExisted) {
+            throw new InvalidOpenTofuScriptsException(
+                    "No OpenTofu scripts found in the "
+                            + scriptsRepo.getRepoUrl()
+                            + " repo's '"
+                            + (StringUtils.isNotBlank(scriptsRepo.getScriptPath())
+                            ? File.separator + scriptsRepo.getScriptPath() : "root")
+                            + "' folder.");
+        }
     }
 }

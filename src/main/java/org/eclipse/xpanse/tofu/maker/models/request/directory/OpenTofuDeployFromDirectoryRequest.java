@@ -22,27 +22,27 @@ import org.eclipse.xpanse.tofu.maker.opentofu.tool.OpenTofuVersionsHelper;
 public class OpenTofuDeployFromDirectoryRequest {
 
     @Schema(description = "Id of the request.")
-    UUID requestId;
+    private UUID requestId;
 
     @NotNull
     @NotBlank
     @Pattern(regexp = OpenTofuVersionsHelper.OPENTOFU_REQUIRED_VERSION_REGEX)
     @Schema(description = "The required version of the OpenTofu which will execute the scripts.")
-    String openTofuVersion;
+    private String openTofuVersion;
 
     @NotNull
     @Schema(description = "Flag to control if the deployment must only generate the OpenTofu "
             + "or it must also apply the changes.")
-    Boolean isPlanOnly;
+    private Boolean isPlanOnly;
 
     @NotNull
     @Schema(description = "Key-value pairs of variables that must be used to execute the "
             + "OpenTofu request.",
             additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
-    Map<String, Object> variables;
+    private Map<String, Object> variables;
 
     @Schema(description = "Key-value pairs of variables that must be injected as environment "
             + "variables to OpenTofu process.",
             additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
-    Map<String, String> envVariables = new HashMap<>();
+    private Map<String, String> envVariables = new HashMap<>();
 }

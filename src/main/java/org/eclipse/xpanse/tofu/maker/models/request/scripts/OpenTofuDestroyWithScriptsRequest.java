@@ -21,7 +21,7 @@ import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFro
 public class OpenTofuDestroyWithScriptsRequest extends OpenTofuDestroyFromDirectoryRequest {
 
     @Schema(description = "Id of the request.")
-    UUID requestId;
+    private UUID requestId;
 
     @NotNull
     @Schema(description = "List of script files for destroy requests deployed via scripts")
