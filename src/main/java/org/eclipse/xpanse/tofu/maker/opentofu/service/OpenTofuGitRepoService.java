@@ -26,6 +26,7 @@ import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.models.validation.OpenTofuValidationResult;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -41,6 +42,8 @@ public class OpenTofuGitRepoService {
     private OpenTofuScriptsHelper scriptsHelper;
     @Resource
     private OpenTofuDirectoryService directoryService;
+    @Resource
+    private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
 
     /**
      * Method of deployment a service using a script.
@@ -135,7 +138,7 @@ public class OpenTofuGitRepoService {
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
         log.info("Deployment service complete, callback POST url:{}, requestBody:{}", url, result);
-        restTemplate.postForLocation(url, result);
+        sendOpenTofuResult(url, result);
     }
 
     /**
@@ -159,7 +162,7 @@ public class OpenTofuGitRepoService {
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
         log.info("Modify service complete, callback POST url:{}, requestBody:{}", url, result);
-        restTemplate.postForLocation(url, result);
+        sendOpenTofuResult(url, result);
     }
 
 
@@ -184,9 +187,16 @@ public class OpenTofuGitRepoService {
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
         log.info("Destroy service complete, callback POST url:{}, requestBody:{}", url, result);
-        restTemplate.postForLocation(url, result);
+        sendOpenTofuResult(url, result);
     }
 
+    private void sendOpenTofuResult(String url, OpenTofuResult result) {
+        try {
+            restTemplate.postForLocation(url, result);
+        } catch (RestClientException e) {
+            openTofuResultPersistenceManage.persistOpenTofuResult(result);
+        }
+    }
 
     private String getScriptsLocationInTaskWorkspace(
             OpenTofuScriptGitRepoDetails terraformScriptGitRepoDetails, String taskWorkSpace) {

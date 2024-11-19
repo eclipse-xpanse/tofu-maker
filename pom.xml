@@ -31,6 +31,7 @@
 		<jgit.version>7.0.0.202409031743-r</jgit.version>
 		<semver4j.version>5.4.1</semver4j.version>
 		<github-api.version>1.326</github-api.version>
+		<eclipse.serializer.version>2.0.0</eclipse.serializer.version>
 		<maven.complier.plugin.version>3.13.0</maven.complier.plugin.version>
 		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 		<maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
@@ -133,6 +134,11 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.serializer</groupId>
+			<artifactId>serializer</artifactId>
+			<version>${eclipse.serializer.version}</version>
 		</dependency>
 	</dependencies>
 
