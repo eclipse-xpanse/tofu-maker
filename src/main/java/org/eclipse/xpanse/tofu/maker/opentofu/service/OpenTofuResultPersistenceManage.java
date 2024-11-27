@@ -16,6 +16,7 @@ import org.eclipse.xpanse.tofu.maker.models.exceptions.ResultAlreadyReturnedOrRe
 import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.utils.OpenTofuResultSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,10 +27,16 @@ import org.springframework.stereotype.Component;
 public class OpenTofuResultPersistenceManage {
 
     private static final String TF_RESULT_FILE_SUFFIX = ".dat";
+    private static final String TF_LOCK_FILE_NAME = ".terraform.tfstate.lock.info";
 
     @Value("${failed.callback.response.store.location}")
     private String failedCallbackStoreLocation;
 
+    @Value("${clean.workspace.after.deployment.enabled:true}")
+    private Boolean cleanWorkspaceAfterDeployment;
+
+    @Resource
+    private OpenTofuScriptsHelper scriptsHelper;
     @Resource
     private OpenTofuResultSerializer openTofuResultSerializer;
 
@@ -64,10 +71,13 @@ public class OpenTofuResultPersistenceManage {
      * @param requestId requestId.
      * @return OpenTofuResult.
      */
-    public OpenTofuResult retrieveOpenTofuResultByRequestId(String requestId) {
+    public ResponseEntity<OpenTofuResult> retrieveOpenTofuResultByRequestId(String requestId) {
         String filePath = getFilePath(UUID.fromString(requestId));
         File resultFile = new File(filePath + File.separator + requestId + TF_RESULT_FILE_SUFFIX);
         if (!resultFile.exists() && !resultFile.isFile()) {
+            if (isDeployingInProgress(requestId)) {
+                return ResponseEntity.noContent().build();
+            }
             throw new ResultAlreadyReturnedOrRequestIdInvalidException(
                     "Result file does not exist: " + resultFile.getAbsolutePath());
         }
@@ -77,11 +87,23 @@ public class OpenTofuResultPersistenceManage {
                     .deserialize(openTofuResultData);
             fis.close();
             deleteResultFileAndDirectory(new File(filePath));
-            return openTofuResult;
+            return ResponseEntity.ok(openTofuResult);
         } catch (IOException e) {
             log.error("Failed to retrieve OpenTofuResult for requestId: {}", requestId, e);
             throw new ResultAlreadyReturnedOrRequestIdInvalidException(
                     "Failed to retrieve OpenTofuResult for requestId: " + requestId);
+        }
+    }
+
+    private boolean isDeployingInProgress(String requestId) {
+        String workspace = scriptsHelper.buildTaskWorkspace(requestId);
+        File targetFile;
+        if (cleanWorkspaceAfterDeployment) {
+            targetFile = new File(workspace);
+            return targetFile.exists() && targetFile.isDirectory();
+        } else {
+            targetFile = new File(workspace, TF_LOCK_FILE_NAME);
+            return targetFile.exists() && targetFile.isFile();
         }
     }
 

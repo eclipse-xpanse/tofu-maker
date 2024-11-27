@@ -15,6 +15,7 @@ import org.eclipse.xpanse.tofu.maker.models.response.OpenTofuResult;
 import org.eclipse.xpanse.tofu.maker.opentofu.service.OpenTofuResultPersistenceManage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +42,7 @@ public class OpenTofuMakerTaskResultApi {
     @GetMapping(value = "/result/{requestId}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public OpenTofuResult getStoredTaskResultByRequestId(
+    public ResponseEntity<OpenTofuResult> getStoredTaskResultByRequestId(
             @Parameter(name = "requestId",
                     description = "id of the request")
             @PathVariable("requestId") String requestId) {
