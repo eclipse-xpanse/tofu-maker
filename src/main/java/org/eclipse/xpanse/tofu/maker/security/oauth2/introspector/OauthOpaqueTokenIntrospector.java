@@ -8,8 +8,8 @@ package org.eclipse.xpanse.tofu.maker.security.oauth2.introspector;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
+import org.springframework.security.oauth2.server.resource.introspection.SpringOpaqueTokenIntrospector;
 
 /**
  * Customize the OAuth2AuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector.
@@ -30,7 +30,7 @@ public class OauthOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
                                         String clientId,
                                         String clientSecret) {
         opaqueTokenIntrospector =
-                new NimbusOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
+                new SpringOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
     }
 
     /**
