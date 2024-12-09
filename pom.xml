@@ -24,7 +24,6 @@
 		<springdoc.version>2.7.0</springdoc.version>
 		<checkstyle-maven-plugin.version>3.6.0</checkstyle-maven-plugin.version>
 		<logbook.version>3.10.0</logbook.version>
-		<nimbusds.oidc.sdk.version>11.20.1</nimbusds.oidc.sdk.version>
 		<lombok.version>1.18.30</lombok.version>
 		<opentelemetry.version>2.8.0</opentelemetry.version>
 		<eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
@@ -100,11 +99,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>oauth2-oidc-sdk</artifactId>
-			<version>${nimbusds.oidc.sdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.opentelemetry.instrumentation</groupId>

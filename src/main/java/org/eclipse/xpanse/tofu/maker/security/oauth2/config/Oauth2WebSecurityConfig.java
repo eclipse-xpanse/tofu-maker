@@ -9,9 +9,9 @@ package org.eclipse.xpanse.tofu.maker.security.oauth2.config;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.time.Duration;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,14 +28,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
-import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
-import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -69,6 +62,9 @@ public class Oauth2WebSecurityConfig {
 
     @Value("${spring.security.oauth2.resourceserver.opaquetoken.client-secret}")
     private String clientSecret;
+
+    @Resource
+    private Oauth2JwtDecoder oauth2JwtDecoder;
 
     /**
      * Configures basic security handler per HTTP session.
@@ -145,14 +141,9 @@ public class Oauth2WebSecurityConfig {
     }
 
     @Bean
-    @ConditionalOnProperty("authorization.token.type")
+    @ConditionalOnProperty(name = "authorization.token.type", havingValue = "JWT")
     JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
-        OAuth2TokenValidator<Jwt> withClockSkew = new DelegatingOAuth2TokenValidator<>(
-                new JwtTimestampValidator(Duration.ofSeconds(60)),
-                new JwtIssuerValidator(issuerUri));
-        jwtDecoder.setJwtValidator(withClockSkew);
-        return jwtDecoder;
+        return oauth2JwtDecoder.createJwtDecoder(issuerUri);
     }
 
 }
