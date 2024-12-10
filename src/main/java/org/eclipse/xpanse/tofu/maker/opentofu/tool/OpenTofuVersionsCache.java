@@ -11,6 +11,7 @@ import static org.eclipse.xpanse.tofu.maker.cache.CaffeineCacheConfig.OPENTOFU_V
 import jakarta.annotation.Resource;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenTofuVersionsCache {
 
+    @Value("${support.default.opentofu.versions.only:true}")
+    private boolean getDefaultVersionsOnly;
     @Resource
     private OpenTofuVersionsFetcher versionsFetcher;
 
@@ -31,6 +34,9 @@ public class OpenTofuVersionsCache {
      */
     @Cacheable(value = OPENTOFU_VERSIONS_CACHE_NAME, key = "'all'")
     public Set<String> getAvailableVersions() {
+        if (getDefaultVersionsOnly) {
+            return versionsFetcher.getDefaultVersionsFromConfig();
+        }
         try {
             return versionsFetcher.fetchAvailableVersionsFromOpenTofuWebsite();
         } catch (Exception e) {
