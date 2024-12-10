@@ -14,4 +14,4 @@ RUN echo "Downloading and installing OpenTofu with multiple versions $OPENTOFU_V
 
 COPY target/tofu-maker-*.jar tofu-maker.jar
 USER tofu-maker
-ENTRYPOINT ["java", "-Dopentofu.install.dir=${OPENTOFU_INSTALL_PATH}", "-Dopentofu.version=${OPENTOFU_VERSIONS}", "-jar", "tofu-maker.jar"]
+ENTRYPOINT ["java", "-Dopentofu.install.dir=${OPENTOFU_INSTALL_PATH}", "-Dopentofu.default.supported.versions=${OPENTOFU_VERSIONS}", "-jar", "tofu-maker.jar"]
