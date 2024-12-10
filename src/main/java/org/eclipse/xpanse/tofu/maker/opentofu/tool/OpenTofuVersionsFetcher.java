@@ -44,7 +44,7 @@ public class OpenTofuVersionsFetcher {
     private String openTofuGithubApiEndpoint;
     @Value("${opentofu.github.repository:opentofu/opentofu}")
     private String openTofuGithubRepository;
-    @Value("${opentofu.versions}")
+    @Value("${opentofu.default.supported.versions}")
     private String defaultVersionsString;
 
     /**
