@@ -10,9 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.git.OpenTofuScriptGitRepoDetails;
 
-/**
- * Data model for the generating open tofu plan using OpenTofu scripts from a GIT repo.
- */
+/** Data model for the generating open tofu plan using OpenTofu scripts from a GIT repo. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuPlanFromGitRepoRequest extends OpenTofuPlanFromDirectoryRequest {

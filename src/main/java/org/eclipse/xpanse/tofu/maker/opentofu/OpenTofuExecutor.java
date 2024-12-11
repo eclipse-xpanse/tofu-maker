@@ -23,9 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * An executor for opentofu.
- */
+/** An executor for opentofu. */
 @Slf4j
 @Component
 public class OpenTofuExecutor {
@@ -50,26 +48,21 @@ public class OpenTofuExecutor {
     /**
      * Constructor for the OpenTofuExecutor bean.
      *
-     * @param systemCmd                    SystemCmd bean
-     * @param moduleParentDirectoryPath    value of `opentofu.root.module.directory` property
+     * @param systemCmd SystemCmd bean
+     * @param moduleParentDirectoryPath value of `opentofu.root.module.directory` property
      * @param isStdoutStdErrLoggingEnabled value of `log.opentofu.stdout.stderr` property
-     * @param customOpenTofuBinary         value of `opentofu.binary.location` property
-     * @param openTofuLogLevel             value of `opentofu.log.level` property
+     * @param customOpenTofuBinary value of `opentofu.binary.location` property
+     * @param openTofuLogLevel value of `opentofu.log.level` property
      */
     @Autowired
-    public OpenTofuExecutor(SystemCmd systemCmd,
-                            @Value("${opentofu.root.module.directory}")
-                            String moduleParentDirectoryPath,
-                            @Value("${log.opentofu.stdout.stderr:true}")
-                            boolean isStdoutStdErrLoggingEnabled,
-                            @Value("${opentofu.binary.location}")
-                            String customOpenTofuBinary,
-                            @Value("${opentofu.log.level}")
-                            String openTofuLogLevel
-    ) {
+    public OpenTofuExecutor(
+            SystemCmd systemCmd,
+            @Value("${opentofu.root.module.directory}") String moduleParentDirectoryPath,
+            @Value("${log.opentofu.stdout.stderr:true}") boolean isStdoutStdErrLoggingEnabled,
+            @Value("${opentofu.binary.location}") String customOpenTofuBinary,
+            @Value("${opentofu.log.level}") String openTofuLogLevel) {
         if (moduleParentDirectoryPath.isBlank() || moduleParentDirectoryPath.isEmpty()) {
-            this.moduleParentDirectoryPath =
-                    System.getProperty("java.io.tmpdir");
+            this.moduleParentDirectoryPath = System.getProperty("java.io.tmpdir");
         } else {
             this.moduleParentDirectoryPath = moduleParentDirectoryPath;
         }
@@ -79,114 +72,115 @@ public class OpenTofuExecutor {
         this.openTofuLogLevel = openTofuLogLevel;
     }
 
-    /**
-     * OpenTofu executes init, plan and destroy commands.
-     */
-    public SystemCmdResult tfDestroy(String executorPath, Map<String, Object> variables,
-                                     Map<String, String> envVariables, String moduleDirectory) {
-        tfPlan(executorPath, variables, envVariables, moduleDirectory);
-        SystemCmdResult applyResult = tfDestroyCommand(
-                executorPath, variables, envVariables, getModuleFullPath(moduleDirectory));
-        if (!applyResult.isCommandSuccessful()) {
-            log.error("OpenTofuExecutor.tfDestroy failed.");
-            throw new OpenTofuExecutorException("OpenTofuExecutor.tfDestroy failed.",
-                    applyResult.getCommandStdError());
-        }
-        return applyResult;
-    }
-
-    /**
-     * OpenTofu executes init, plan and apply commands.
-     */
-    public SystemCmdResult tfApply(String executorPath, Map<String, Object> variables,
-                                   Map<String, String> envVariables,
-                                   String moduleDirectory) {
+    /** OpenTofu executes init, plan and destroy commands. */
+    public SystemCmdResult tfDestroy(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String moduleDirectory) {
         tfPlan(executorPath, variables, envVariables, moduleDirectory);
         SystemCmdResult applyResult =
-                tfApplyCommand(executorPath, variables, envVariables,
-                        getModuleFullPath(moduleDirectory));
+                tfDestroyCommand(
+                        executorPath, variables, envVariables, getModuleFullPath(moduleDirectory));
         if (!applyResult.isCommandSuccessful()) {
-            log.error("OpenTofuExecutor.tfApply failed.");
-            throw new OpenTofuExecutorException("OpenTofuExecutor.tfApply failed.",
-                    applyResult.getCommandStdError());
+            log.error("OpenTofuExecutor.tfDestroy failed.");
+            throw new OpenTofuExecutorException(
+                    "OpenTofuExecutor.tfDestroy failed.", applyResult.getCommandStdError());
         }
         return applyResult;
     }
 
-    /**
-     * OpenTofu executes init and plan commands.
-     */
-    public SystemCmdResult tfPlan(String executorPath, Map<String, Object> variables,
-                                  Map<String, String> envVariables,
-                                  String moduleDirectory) {
+    /** OpenTofu executes init, plan and apply commands. */
+    public SystemCmdResult tfApply(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String moduleDirectory) {
+        tfPlan(executorPath, variables, envVariables, moduleDirectory);
+        SystemCmdResult applyResult =
+                tfApplyCommand(
+                        executorPath, variables, envVariables, getModuleFullPath(moduleDirectory));
+        if (!applyResult.isCommandSuccessful()) {
+            log.error("OpenTofuExecutor.tfApply failed.");
+            throw new OpenTofuExecutorException(
+                    "OpenTofuExecutor.tfApply failed.", applyResult.getCommandStdError());
+        }
+        return applyResult;
+    }
+
+    /** OpenTofu executes init and plan commands. */
+    public SystemCmdResult tfPlan(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String moduleDirectory) {
         tfInit(executorPath, moduleDirectory);
         SystemCmdResult planResult =
-                tfPlanCommand(executorPath, variables, envVariables,
-                        getModuleFullPath(moduleDirectory));
+                tfPlanCommand(
+                        executorPath, variables, envVariables, getModuleFullPath(moduleDirectory));
         if (!planResult.isCommandSuccessful()) {
             log.error("OpenTofuExecutor.tfPlan failed.");
-            throw new OpenTofuExecutorException("OpenTofuExecutor.tfPlan failed.",
-                    planResult.getCommandStdError());
+            throw new OpenTofuExecutorException(
+                    "OpenTofuExecutor.tfPlan failed.", planResult.getCommandStdError());
         }
         return planResult;
     }
 
-    /**
-     * Method to execute open tofu plan and get the plan as a json string.
-     */
-    public String getOpenTofuPlanAsJson(String executorPath, Map<String, Object> variables,
-                                        Map<String, String> envVariables,
-                                        String moduleDirectory) {
+    /** Method to execute open tofu plan and get the plan as a json string. */
+    public String getOpenTofuPlanAsJson(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String moduleDirectory) {
         tfInit(executorPath, moduleDirectory);
-        SystemCmdResult tfPlanResult = executeWithVariables(
-                new StringBuilder(
-                        getOpenTofuCommand(executorPath,
-                                "plan -input=false -no-color --out tfplan.binary ")),
-                variables, envVariables, getModuleFullPath(moduleDirectory));
+        SystemCmdResult tfPlanResult =
+                executeWithVariables(
+                        new StringBuilder(
+                                getOpenTofuCommand(
+                                        executorPath,
+                                        "plan -input=false -no-color --out tfplan.binary ")),
+                        variables,
+                        envVariables,
+                        getModuleFullPath(moduleDirectory));
         if (!tfPlanResult.isCommandSuccessful()) {
             log.error("OpenTofuExecutor.tfPlan failed.");
-            throw new OpenTofuExecutorException("OpenTofuExecutor.tfPlan failed.",
-                    tfPlanResult.getCommandStdError());
+            throw new OpenTofuExecutorException(
+                    "OpenTofuExecutor.tfPlan failed.", tfPlanResult.getCommandStdError());
         }
         SystemCmdResult planJsonResult =
-                execute(getOpenTofuCommand(executorPath, "show -json tfplan.binary"),
-                        getModuleFullPath(moduleDirectory), envVariables);
+                execute(
+                        getOpenTofuCommand(executorPath, "show -json tfplan.binary"),
+                        getModuleFullPath(moduleDirectory),
+                        envVariables);
         if (!planJsonResult.isCommandSuccessful()) {
             log.error("Reading OpenTofu plan as JSON failed.");
-            throw new OpenTofuExecutorException("Reading OpenTofu plan as JSON failed.",
-                    planJsonResult.getCommandStdError());
+            throw new OpenTofuExecutorException(
+                    "Reading OpenTofu plan as JSON failed.", planJsonResult.getCommandStdError());
         }
         return planJsonResult.getCommandStdOutput();
     }
 
-    /**
-     * OpenTofu executes the init command.
-     */
+    /** OpenTofu executes the init command. */
     public SystemCmdResult tfValidate(String executorPath, String moduleDirectory) {
         tfInit(executorPath, moduleDirectory);
         return tfValidateCommand(executorPath, getModuleFullPath(moduleDirectory));
     }
 
-    /**
-     * OpenTofu executes the init command.
-     */
+    /** OpenTofu executes the init command. */
     public void tfInit(String executorPath, String moduleDirectory) {
         SystemCmdResult initResult =
                 tfInitCommand(executorPath, getModuleFullPath(moduleDirectory));
         if (!initResult.isCommandSuccessful()) {
             log.error("OpenTofuExecutor.tfInit failed.");
-            throw new OpenTofuExecutorException("OpenTofuExecutor.tfInit failed.",
-                    initResult.getCommandStdError());
+            throw new OpenTofuExecutorException(
+                    "OpenTofuExecutor.tfInit failed.", initResult.getCommandStdError());
         }
     }
 
-    /**
-     * Get the full path of Module.
-     */
+    /** Get the full path of Module. */
     public String getModuleFullPath(String moduleDirectory) {
         return this.moduleParentDirectoryPath + File.separator + moduleDirectory;
     }
-
 
     /**
      * Executes open tofu init command.
@@ -194,8 +188,8 @@ public class OpenTofuExecutor {
      * @return Returns result of SystemCmd executed.
      */
     private SystemCmdResult tfInitCommand(String executorPath, String workspace) {
-        return execute(getOpenTofuCommand(executorPath, "init -no-color"),
-                workspace, new HashMap<>());
+        return execute(
+                getOpenTofuCommand(executorPath, "init -no-color"), workspace, new HashMap<>());
     }
 
     /**
@@ -204,8 +198,10 @@ public class OpenTofuExecutor {
      * @return Returns result of SystemCmd executed.
      */
     private SystemCmdResult tfValidateCommand(String executorPath, String workspace) {
-        return execute(getOpenTofuCommand(executorPath, "validate -json -no-color"),
-                workspace, new HashMap<>());
+        return execute(
+                getOpenTofuCommand(executorPath, "validate -json -no-color"),
+                workspace,
+                new HashMap<>());
     }
 
     /**
@@ -213,11 +209,16 @@ public class OpenTofuExecutor {
      *
      * @return Returns result of SystemCmd executed.
      */
-    private SystemCmdResult tfPlanCommand(String executorPath, Map<String, Object> variables,
-                                          Map<String, String> envVariables, String workspace) {
+    private SystemCmdResult tfPlanCommand(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String workspace) {
         return executeWithVariables(
                 new StringBuilder(getOpenTofuCommand(executorPath, "plan -input=false -no-color ")),
-                variables, envVariables, workspace);
+                variables,
+                envVariables,
+                workspace);
     }
 
     /**
@@ -225,13 +226,18 @@ public class OpenTofuExecutor {
      *
      * @return Returns result of SystemCmd executed.
      */
-    private SystemCmdResult tfApplyCommand(String executorPath, Map<String, Object> variables,
-                                           Map<String, String> envVariables, String workspace) {
+    private SystemCmdResult tfApplyCommand(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String workspace) {
         return executeWithVariables(
                 new StringBuilder(
-                        getOpenTofuCommand(executorPath,
-                                "apply -auto-approve -input=false -no-color ")),
-                variables, envVariables, workspace);
+                        getOpenTofuCommand(
+                                executorPath, "apply -auto-approve -input=false -no-color ")),
+                variables,
+                envVariables,
+                workspace);
     }
 
     /**
@@ -239,11 +245,16 @@ public class OpenTofuExecutor {
      *
      * @return Returns result of SystemCmd executed.
      */
-    private SystemCmdResult tfDestroyCommand(String executorPath, Map<String, Object> variables,
-                                             Map<String, String> envVariables, String workspace) {
+    private SystemCmdResult tfDestroyCommand(
+            String executorPath,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String workspace) {
         return executeWithVariables(
                 new StringBuilder(executorPath + " destroy -auto-approve -input=false -no-color "),
-                variables, envVariables, workspace);
+                variables,
+                envVariables,
+                workspace);
     }
 
     /**
@@ -251,10 +262,11 @@ public class OpenTofuExecutor {
      *
      * @return Returns result of SystemCmd executed.
      */
-    private SystemCmdResult executeWithVariables(StringBuilder command,
-                                                 Map<String, Object> variables,
-                                                 Map<String, String> envVariables,
-                                                 String workspace) {
+    private SystemCmdResult executeWithVariables(
+            StringBuilder command,
+            Map<String, Object> variables,
+            Map<String, String> envVariables,
+            String workspace) {
         createVariablesFile(variables, workspace);
         command.append(" -var-file=");
         command.append(VARS_FILE_NAME);
@@ -268,11 +280,11 @@ public class OpenTofuExecutor {
      *
      * @return SystemCmdResult
      */
-    private SystemCmdResult execute(String cmd, String workspace,
-                                    @NonNull Map<String, String> envVariables) {
+    private SystemCmdResult execute(
+            String cmd, String workspace, @NonNull Map<String, String> envVariables) {
         envVariables.putAll(getOpenTofuLogConfig());
-        return this.systemCmd.execute(cmd, workspace, this.isStdoutStdErrLoggingEnabled,
-                envVariables);
+        return this.systemCmd.execute(
+                cmd, workspace, this.isStdoutStdErrLoggingEnabled, envVariables);
     }
 
     private String getOpenTofuCommand(String executorPath, String openTofuArguments) {
@@ -281,7 +293,6 @@ public class OpenTofuExecutor {
         }
         return this.customOpenTofuBinary + " " + openTofuArguments;
     }
-
 
     private Map<String, String> getOpenTofuLogConfig() {
         return Collections.singletonMap("TF_LOG", this.openTofuLogLevel);
@@ -292,8 +303,8 @@ public class OpenTofuExecutor {
             log.info("creating variables file");
             OBJECT_MAPPER.writeValue(new File(getVariablesFilePath(workspace)), variables);
         } catch (IOException ioException) {
-            throw new OpenTofuExecutorException("Creating variables file failed",
-                    ioException.getMessage());
+            throw new OpenTofuExecutorException(
+                    "Creating variables file failed", ioException.getMessage());
         }
     }
 

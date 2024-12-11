@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.webhook.WebhookConfig;
 
-/**
- * Data model for open tofu async destroy requests using scripts from a GIT Repo.
- */
+/** Data model for open tofu async destroy requests using scripts from a GIT Repo. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuAsyncDestroyFromGitRepoRequest extends OpenTofuDestroyFromGitRepoRequest {
@@ -21,5 +19,4 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest extends OpenTofuDestroyFromG
     @NotNull
     @Schema(description = "Configuration information of webhook.")
     private WebhookConfig webhookConfig;
-
 }

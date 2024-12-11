@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.tofu.maker.opentofu.tool;
 
-
 import static org.eclipse.xpanse.tofu.maker.cache.CaffeineCacheConfig.OPENTOFU_VERSIONS_CACHE_NAME;
 
 import jakarta.annotation.Resource;
@@ -14,15 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to update the cache of versions of OpenTofu.
- */
+/** Bean to update the cache of versions of OpenTofu. */
 @Slf4j
 @Component
 public class OpenTofuVersionsCache {
 
-    @Resource
-    private OpenTofuVersionsFetcher versionsFetcher;
+    @Resource private OpenTofuVersionsFetcher versionsFetcher;
 
     /**
      * Get the available versions of OpenTofu.
@@ -47,5 +43,4 @@ public class OpenTofuVersionsCache {
     public void updateCachedVersions(Set<String> versions) {
         log.info("Updated OpenTofu versions cache with versions:{}.", versions);
     }
-
 }

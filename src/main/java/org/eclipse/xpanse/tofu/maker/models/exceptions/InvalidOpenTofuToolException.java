@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.tofu.maker.models.exceptions;
 
-/**
- * Defines possible exceptions returned by OpenTofu version invalid.
- */
+/** Defines possible exceptions returned by OpenTofu version invalid. */
 public class InvalidOpenTofuToolException extends RuntimeException {
 
     public InvalidOpenTofuToolException(String message) {

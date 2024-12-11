@@ -12,9 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuModifyFromDirectoryRequest;
 
-/**
- * OpenTofu uses the request object modify by the script.
- */
+/** OpenTofu uses the request object modify by the script. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuModifyWithScriptsRequest extends OpenTofuModifyFromDirectoryRequest {

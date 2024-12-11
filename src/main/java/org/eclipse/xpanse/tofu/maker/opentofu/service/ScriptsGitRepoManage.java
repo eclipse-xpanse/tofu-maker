@@ -20,9 +20,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage GIT clone.
- */
+/** Bean to manage GIT clone. */
 @Slf4j
 @Component
 public class ScriptsGitRepoManage {
@@ -30,15 +28,18 @@ public class ScriptsGitRepoManage {
     /**
      * Method to check out scripts from a GIT repo.
      *
-     * @param workspace   directory where the GIT clone must be executed.
+     * @param workspace directory where the GIT clone must be executed.
      * @param scriptsRepo directory inside the GIT repo where scripts are expected to be present.
      */
-    @Retryable(retryFor = GitRepoCloneException.class,
+    @Retryable(
+            retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${spring.retry.max-attempts}",
             backoff = @Backoff(delayExpression = "${spring.retry.delay-millions}"))
     public void checkoutScripts(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
-        log.info("Clone GIT repo to get the deployment scripts. Retry number: "
-                + Objects.requireNonNull(RetrySynchronizationManager.getContext()).getRetryCount());
+        log.info(
+                "Clone GIT repo to get the deployment scripts. Retry number: "
+                        + Objects.requireNonNull(RetrySynchronizationManager.getContext())
+                                .getRetryCount());
         File workspaceDirectory = new File(workspace);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
@@ -61,7 +62,6 @@ public class ScriptsGitRepoManage {
             log.info("Scripts repo is already cloned in the workspace.");
         }
     }
-
 
     /**
      * Recover method for checkoutScripts.

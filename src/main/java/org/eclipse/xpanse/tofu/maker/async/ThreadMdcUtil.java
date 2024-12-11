@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import org.slf4j.MDC;
 
-/**
- * Bean to get mdc logging info.
- */
+/** Bean to get mdc logging info. */
 public final class ThreadMdcUtil {
 
     /**
@@ -19,12 +17,12 @@ public final class ThreadMdcUtil {
      * own MDC to the child thread.
      *
      * @param callable callable task
-     * @param context  context
-     * @param <T>      return object type
+     * @param context context
+     * @param <T> return object type
      * @return T
      */
-    public static <T> Callable<T> wrap(final Callable<T> callable,
-                                       final Map<String, String> context) {
+    public static <T> Callable<T> wrap(
+            final Callable<T> callable, final Map<String, String> context) {
         return () -> {
             if (context == null) {
                 MDC.clear();
@@ -44,7 +42,7 @@ public final class ThreadMdcUtil {
      * own MDC to the child thread.
      *
      * @param runnable runnable task
-     * @param context  context
+     * @param context context
      * @return thread task
      */
     public static Runnable wrap(final Runnable runnable, final Map<String, String> context) {

@@ -11,16 +11,14 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Data model for the generating openTofu plan.
- */
+/** Data model for the generating openTofu plan. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuPlanWithScriptsRequest extends OpenTofuPlanFromDirectoryRequest {
 
     @NotNull
-    @Schema(description =
-            "List of openTofu script files to be considered for generating openTofu plan")
+    @Schema(
+            description =
+                    "List of openTofu script files to be considered for generating openTofu plan")
     private List<String> scripts;
-
 }

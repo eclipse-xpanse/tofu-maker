@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.webhook.WebhookConfig;
 
-/**
- * Data model for the OpenTofu async deploy requests.
- */
+/** Data model for the OpenTofu async deploy requests. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuAsyncDeployFromDirectoryRequest extends OpenTofuDeployFromDirectoryRequest {
@@ -21,5 +19,4 @@ public class OpenTofuAsyncDeployFromDirectoryRequest extends OpenTofuDeployFromD
     @NotNull
     @Schema(description = "Configuration information of webhook.")
     private WebhookConfig webhookConfig;
-
 }

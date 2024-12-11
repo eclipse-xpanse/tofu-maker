@@ -31,9 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * OpenTofu service classes are deployed form Scripts.
- */
+/** OpenTofu service classes are deployed form Scripts. */
 @Slf4j
 @Service
 public class OpenTofuScriptsService extends OpenTofuDirectoryService {
@@ -43,12 +41,12 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
     private final OpenTofuExecutor executor;
     private final OpenTofuScriptsHelper openTofuScriptsHelper;
 
-    /**
-     * OpenTofuScriptsService constructor.
-     */
+    /** OpenTofuScriptsService constructor. */
     @Autowired
-    public OpenTofuScriptsService(OpenTofuExecutor executor, RestTemplate restTemplate,
-                                  OpenTofuScriptsHelper openTofuScriptsHelper) {
+    public OpenTofuScriptsService(
+            OpenTofuExecutor executor,
+            RestTemplate restTemplate,
+            OpenTofuScriptsHelper openTofuScriptsHelper) {
         super(executor, restTemplate);
         this.executor = executor;
         this.restTemplate = restTemplate;
@@ -56,53 +54,39 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         this.openTofuScriptsHelper = openTofuScriptsHelper;
     }
 
-    /**
-     * Method of deployment a service using a script.
-     */
-    public OpenTofuValidationResult validateWithScripts(
-            OpenTofuDeployWithScriptsRequest request) {
+    /** Method of deployment a service using a script. */
+    public OpenTofuValidationResult validateWithScripts(OpenTofuDeployWithScriptsRequest request) {
         UUID uuid = UUID.randomUUID();
         buildDeployEnv(request.getScripts(), uuid);
         return tfValidateFromDirectory(uuid.toString(), request.getOpenTofuVersion());
     }
 
-    /**
-     * Method of deployment a service using a script.
-     */
+    /** Method of deployment a service using a script. */
     public OpenTofuResult deployWithScripts(OpenTofuDeployWithScriptsRequest request, UUID uuid) {
         buildDeployEnv(request.getScripts(), uuid);
         return deployFromDirectory(request, uuid.toString());
     }
 
-    /**
-     * Method of modify a service using a script.
-     */
+    /** Method of modify a service using a script. */
     public OpenTofuResult modifyWithScripts(OpenTofuModifyWithScriptsRequest request, UUID uuid) {
         buildModifyEnv(request.getScripts(), request.getTfState(), uuid);
         return modifyFromDirectory(request, uuid.toString());
     }
 
-    /**
-     * Method of destroy a service using a script.
-     */
-    public OpenTofuResult destroyWithScripts(OpenTofuDestroyWithScriptsRequest request,
-                                             UUID uuid) {
+    /** Method of destroy a service using a script. */
+    public OpenTofuResult destroyWithScripts(OpenTofuDestroyWithScriptsRequest request, UUID uuid) {
         buildDestroyEnv(request.getScripts(), request.getTfState(), uuid);
         return destroyFromDirectory(request, uuid.toString());
     }
 
-    /**
-     * Method to get OpenTofu plan.
-     */
-    public OpenTofuPlan getOpenTofuPlanFromScripts(OpenTofuPlanWithScriptsRequest request,
-                                                   UUID uuid) {
+    /** Method to get OpenTofu plan. */
+    public OpenTofuPlan getOpenTofuPlanFromScripts(
+            OpenTofuPlanWithScriptsRequest request, UUID uuid) {
         buildDeployEnv(request.getScripts(), uuid);
         return getOpenTofuPlanFromDirectory(request, uuid.toString());
     }
 
-    /**
-     * Async deploy a source by OpenTofu.
-     */
+    /** Async deploy a source by OpenTofu. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
     public void asyncDeployWithScripts(
             OpenTofuAsyncDeployFromScriptsRequest asyncDeployRequest, UUID uuid) {
@@ -110,13 +94,14 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         try {
             result = deployWithScripts(asyncDeployRequest, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .importantFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .importantFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
@@ -124,9 +109,7 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         restTemplate.postForLocation(url, result);
     }
 
-    /**
-     * Async deploy a source by OpenTofu.
-     */
+    /** Async deploy a source by OpenTofu. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
     public void asyncModifyWithScripts(
             OpenTofuAsyncModifyFromScriptsRequest asyncModifyRequest, UUID uuid) {
@@ -134,13 +117,14 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         try {
             result = modifyWithScripts(asyncModifyRequest, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .importantFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .importantFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
@@ -148,23 +132,21 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
         restTemplate.postForLocation(url, result);
     }
 
-    /**
-     * Async destroy resource of the service.
-     */
+    /** Async destroy resource of the service. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromScriptsRequest request,
-                                        UUID uuid) {
+    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromScriptsRequest request, UUID uuid) {
         OpenTofuResult result;
         try {
             result = destroyWithScripts(request, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .importantFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .importantFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
@@ -201,8 +183,8 @@ public class OpenTofuScriptsService extends OpenTofuDirectoryService {
     private void buildScriptFiles(String workspace, UUID uuid, List<String> scripts) {
         log.info("start build OpenTofu script");
         if (CollectionUtils.isEmpty(scripts)) {
-            throw new OpenTofuExecutorException("OpenTofu scripts create error, OpenTofu "
-                    + "scripts not exists");
+            throw new OpenTofuExecutorException(
+                    "OpenTofu scripts create error, OpenTofu " + "scripts not exists");
         }
         StringBuilder scriptBuilder = new StringBuilder();
         for (String script : scripts) {

@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFromDirectoryRequest;
 
-/**
- * Data model for open tofu destroy requests using scripts from a GIT Repo.
- */
+/** Data model for open tofu destroy requests using scripts from a GIT Repo. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuDestroyFromGitRepoRequest extends OpenTofuDestroyFromDirectoryRequest {

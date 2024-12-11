@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.webhook.WebhookConfig;
 
-/**
- * Data model for the openTofu async destroy requests.
- */
+/** Data model for the openTofu async destroy requests. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuAsyncDestroyFromScriptsRequest extends OpenTofuDestroyWithScriptsRequest {
@@ -21,5 +19,4 @@ public class OpenTofuAsyncDestroyFromScriptsRequest extends OpenTofuDestroyWithS
     @NotNull
     @Schema(description = "Configuration information of webhook.")
     private WebhookConfig webhookConfig;
-
 }

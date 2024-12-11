@@ -14,9 +14,7 @@ import org.eclipse.xpanse.tofu.maker.models.exceptions.OpenTofuExecutorException
 import org.eclipse.xpanse.tofu.maker.opentofu.OpenTofuExecutor;
 import org.springframework.stereotype.Component;
 
-/**
- * bean to host all generic methods shared from different types of OpenTofu deployers.
- */
+/** bean to host all generic methods shared from different types of OpenTofu deployers. */
 @Slf4j
 @Component
 public class OpenTofuScriptsHelper {
@@ -32,7 +30,7 @@ public class OpenTofuScriptsHelper {
     /**
      * Creates the tfstate file in the directory of the OpenTofu module.
      *
-     * @param tfState        state file contents as string.
+     * @param tfState state file contents as string.
      * @param moduleLocation module location where the file must be created.
      */
     public void createTfStateFile(String tfState, String moduleLocation) {

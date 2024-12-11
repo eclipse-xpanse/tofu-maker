@@ -10,9 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.eclipse.xpanse.tofu.maker.models.enums.HealthStatus;
 
-/**
- * Describes health status of the system.
- */
+/** Describes health status of the system. */
 @Data
 public class OpenTofuMakerSystemStatus {
 

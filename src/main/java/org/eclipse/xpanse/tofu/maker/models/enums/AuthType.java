@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.tofu.maker.models.enums;
 
-/**
- * The permission type class when calling back.
- */
+/** The permission type class when calling back. */
 public enum AuthType {
     NONE,
     OAUTH2;

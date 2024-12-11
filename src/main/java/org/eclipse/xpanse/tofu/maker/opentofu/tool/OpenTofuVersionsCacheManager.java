@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.tofu.maker.opentofu.tool;
 
-
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import java.util.Objects;
@@ -15,22 +14,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to update the cache of versions of OpenTofu.
- */
+/** Bean to update the cache of versions of OpenTofu. */
 @Slf4j
 @Component
 public class OpenTofuVersionsCacheManager {
 
-    @Resource
-    private OpenTofuVersionsCache versionsCache;
+    @Resource private OpenTofuVersionsCache versionsCache;
 
-    @Resource
-    private OpenTofuVersionsFetcher versionsFetcher;
+    @Resource private OpenTofuVersionsFetcher versionsFetcher;
 
-    /**
-     * Initialize the cache of available versions of OpenTofu.
-     */
+    /** Initialize the cache of available versions of OpenTofu. */
     @PostConstruct
     public void initializeCache() {
         Set<String> versions = versionsCache.getAvailableVersions();
@@ -38,8 +31,8 @@ public class OpenTofuVersionsCacheManager {
     }
 
     /**
-     * Update the cache with the versions fetched from the Terraform website.
-     * This method is scheduled run once a day.
+     * Update the cache with the versions fetched from the Terraform website. This method is
+     * scheduled run once a day.
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void fetchVersionsFromWebsiteAndLoadCache() {
@@ -47,18 +40,18 @@ public class OpenTofuVersionsCacheManager {
             Set<String> availableVersionsFromWebsite =
                     versionsFetcher.fetchAvailableVersionsFromOpenTofuWebsite();
             versionsCache.updateCachedVersions(availableVersionsFromWebsite);
-            log.info("Updated the cache with versions:{} fetched from OpenTofu website.",
+            log.info(
+                    "Updated the cache with versions:{} fetched from OpenTofu website.",
                     availableVersionsFromWebsite);
         } catch (Exception e) {
-            log.error("Failed to update the cache with versions fetched from OpenTofu website.",
-                    e);
+            log.error("Failed to update the cache with versions fetched from OpenTofu website.", e);
         }
     }
 
     /**
-     * Update the cache when the default versions cached.
-     * This method is scheduled to run every one hour.
-     * But does nothing if the cache already contains versions other than the default version list.
+     * Update the cache when the default versions cached. This method is scheduled to run every one
+     * hour. But does nothing if the cache already contains versions other than the default version
+     * list.
      */
     @Scheduled(cron = "0 1 * * * ?")
     public void fetchVersionsFromWebsiteAndLoadCacheIfCacheHasOnlyDefaultVersions() {
