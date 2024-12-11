@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-/**
- * OpenTofu service classes are manage task result.
- */
+/** OpenTofu service classes are manage task result. */
 @Slf4j
 @Component
 public class OpenTofuResultPersistenceManage {
@@ -35,10 +33,8 @@ public class OpenTofuResultPersistenceManage {
     @Value("${clean.workspace.after.deployment.enabled:true}")
     private Boolean cleanWorkspaceAfterDeployment;
 
-    @Resource
-    private OpenTofuScriptsHelper scriptsHelper;
-    @Resource
-    private OpenTofuResultSerializer openTofuResultSerializer;
+    @Resource private OpenTofuScriptsHelper scriptsHelper;
+    @Resource private OpenTofuResultSerializer openTofuResultSerializer;
 
     /**
      * When the tofu-maker callback fails, store the OpenTofuResult in the local file system.
@@ -53,14 +49,21 @@ public class OpenTofuResultPersistenceManage {
             return;
         }
         byte[] openTofuResultData = openTofuResultSerializer.serialize(result);
-        try (FileOutputStream fos = new FileOutputStream(file.getPath() + File.separator
-                + result.getRequestId() + TF_RESULT_FILE_SUFFIX)) {
+        try (FileOutputStream fos =
+                new FileOutputStream(
+                        file.getPath()
+                                + File.separator
+                                + result.getRequestId()
+                                + TF_RESULT_FILE_SUFFIX)) {
             fos.write(openTofuResultData);
-            log.info("openTofu result successfully stored to directoryName: {}",
+            log.info(
+                    "openTofu result successfully stored to directoryName: {}",
                     result.getRequestId());
         } catch (IOException e) {
-            String errorMsg = String.format("storing openTofu result to "
-                    + "directoryName %s failed. %s", result.getRequestId(), e);
+            String errorMsg =
+                    String.format(
+                            "storing openTofu result to " + "directoryName %s failed. %s",
+                            result.getRequestId(), e);
             log.error(errorMsg);
         }
     }
@@ -83,8 +86,8 @@ public class OpenTofuResultPersistenceManage {
         }
         try (FileInputStream fis = new FileInputStream(resultFile)) {
             byte[] openTofuResultData = fis.readAllBytes();
-            OpenTofuResult openTofuResult = openTofuResultSerializer
-                    .deserialize(openTofuResultData);
+            OpenTofuResult openTofuResult =
+                    openTofuResultSerializer.deserialize(openTofuResultData);
             fis.close();
             deleteResultFileAndDirectory(new File(filePath));
             return ResponseEntity.ok(openTofuResult);
@@ -132,5 +135,4 @@ public class OpenTofuResultPersistenceManage {
     private String getFilePath(UUID requestId) {
         return failedCallbackStoreLocation + File.separator + requestId.toString();
     }
-
 }

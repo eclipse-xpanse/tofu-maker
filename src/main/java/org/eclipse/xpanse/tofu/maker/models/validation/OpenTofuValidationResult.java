@@ -11,9 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Defines the openTofu validation result.
- */
+/** Defines the openTofu validation result. */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenTofuValidationResult {

@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for admin services of tofu-maker.
- */
+/** REST controller for admin services of tofu-maker. */
 @Slf4j
 @CrossOrigin
 @RestController
@@ -34,7 +32,7 @@ public class OpenTofuMakerAdminApi {
     @Autowired
     public OpenTofuMakerAdminApi(
             @Qualifier("openTofuDirectoryService")
-            OpenTofuDirectoryService openTofuDirectoryService) {
+                    OpenTofuDirectoryService openTofuDirectoryService) {
         this.openTofuDirectoryService = openTofuDirectoryService;
     }
 
@@ -43,13 +41,11 @@ public class OpenTofuMakerAdminApi {
      *
      * @return Returns the current state of the system.
      */
-    @Tag(name = "Admin", description =
-            "Admin services for managing the application.")
+    @Tag(name = "Admin", description = "Admin services for managing the application.")
     @Operation(description = "Check health of OpenTofu Maker API service")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuMakerSystemStatus healthCheck() {
         return openTofuDirectoryService.tfHealthCheck();
     }
-
 }

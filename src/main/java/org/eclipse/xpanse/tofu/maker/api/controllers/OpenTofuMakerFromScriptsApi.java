@@ -35,9 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * API methods implemented by tofu-maker.
- */
+/** API methods implemented by tofu-maker. */
 @Slf4j
 @CrossOrigin
 @RestController
@@ -55,16 +53,19 @@ public class OpenTofuMakerFromScriptsApi {
      *
      * @return Returns the status of the deployment.
      */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "Deploy resources via OpenTofu")
-    @PostMapping(value = "/validate", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/validate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuValidationResult validateWithScripts(
             @Valid @RequestBody OpenTofuDeployWithScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return openTofuScriptsService.validateWithScripts(request);
@@ -75,16 +76,19 @@ public class OpenTofuMakerFromScriptsApi {
      *
      * @return Returns the status of the deployment.
      */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "Deploy resources via OpenTofu")
-    @PostMapping(value = "/deploy", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/deploy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult deployWithScripts(
             @Valid @RequestBody OpenTofuDeployWithScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return openTofuScriptsService.deployWithScripts(request, uuid);
@@ -95,91 +99,99 @@ public class OpenTofuMakerFromScriptsApi {
      *
      * @return Returns the status of to Modify.
      */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "Modify resources via OpenTofu")
-    @PostMapping(value = "/modify", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult modifyWithScripts(
             @Valid @RequestBody OpenTofuModifyWithScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return openTofuScriptsService.modifyWithScripts(request, uuid);
     }
-
 
     /**
      * Method to destroy resources by scripts.
      *
      * @return Returns the status of to Destroy.
      */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "Destroy resources via OpenTofu")
-    @PostMapping(value = "/destroy", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/destroy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult destroyWithScripts(
             @Valid @RequestBody OpenTofuDestroyWithScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return openTofuScriptsService.destroyWithScripts(request, uuid);
     }
 
-    /**
-     * Method to async deploy resources by scripts.
-     */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    /** Method to async deploy resources by scripts. */
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "async deploy resources via OpenTofu")
-    @PostMapping(value = "/deploy/async", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/deploy/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDeployWithScripts(
             @Valid @RequestBody OpenTofuAsyncDeployFromScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         openTofuScriptsService.asyncDeployWithScripts(request, uuid);
     }
 
-    /**
-     * Method to async modify resources by scripts.
-     */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    /** Method to async modify resources by scripts. */
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "async modify resources via OpenTofu")
-    @PostMapping(value = "/modify/async", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/modify/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncModifyWithScripts(
             @Valid @RequestBody OpenTofuAsyncModifyFromScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         openTofuScriptsService.asyncModifyWithScripts(request, uuid);
     }
 
-    /**
-     * Method to async destroy resources by scripts.
-     */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
+    /** Method to async destroy resources by scripts. */
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
     @Operation(description = "Async destroy the OpenTofu modules")
-    @DeleteMapping(value = "/destroy/async",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/destroy/async", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDestroyWithScripts(
             @Valid @RequestBody OpenTofuAsyncDestroyFromScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         openTofuScriptsService.asyncDestroyWithScripts(request, uuid);
@@ -190,16 +202,20 @@ public class OpenTofuMakerFromScriptsApi {
      *
      * @return Returns the openTofu plan as a JSON string.
      */
-    @Tag(name = "OpenTofuFromScripts", description =
-            "APIs for running OpenTofu commands on the scripts sent via request body.")
-    @Operation(description =
-            "Get OpenTofu Plan as JSON string from the list of script files provided")
+    @Tag(
+            name = "OpenTofuFromScripts",
+            description =
+                    "APIs for running OpenTofu commands on the scripts sent via request body.")
+    @Operation(
+            description = "Get OpenTofu Plan as JSON string from the list of script files provided")
     @PostMapping(value = "/plan", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuPlan planWithScripts(
             @Valid @RequestBody OpenTofuPlanWithScriptsRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return openTofuScriptsService.getOpenTofuPlanFromScripts(request, uuid);

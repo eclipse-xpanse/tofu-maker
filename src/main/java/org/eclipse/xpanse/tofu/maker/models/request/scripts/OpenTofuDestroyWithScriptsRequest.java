@@ -14,9 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDestroyFromDirectoryRequest;
 
-/**
- * OpenTofu uses the request object destroy by the script.
- */
+/** OpenTofu uses the request object destroy by the script. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuDestroyWithScriptsRequest extends OpenTofuDestroyFromDirectoryRequest {

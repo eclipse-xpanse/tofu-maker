@@ -12,9 +12,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Data model for the generating openTofu plan.
- */
+/** Data model for the generating openTofu plan. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuPlanWithScriptsRequest extends OpenTofuPlanFromDirectoryRequest {
@@ -26,5 +24,4 @@ public class OpenTofuPlanWithScriptsRequest extends OpenTofuPlanFromDirectoryReq
                     "Map stores file name and content of all script files for generating terraform"
                             + " plan.")
     private Map<String, String> scriptFiles;
-
 }

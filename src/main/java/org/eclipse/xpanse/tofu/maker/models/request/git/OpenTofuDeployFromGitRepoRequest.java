@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFromDirectoryRequest;
 
-/**
- * Data model for openTofu deploy requests using scripts from a GIT Repo.
- */
+/** Data model for openTofu deploy requests using scripts from a GIT Repo. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuDeployFromGitRepoRequest extends OpenTofuDeployFromDirectoryRequest {

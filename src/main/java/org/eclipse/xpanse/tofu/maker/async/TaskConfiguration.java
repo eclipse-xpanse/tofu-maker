@@ -27,8 +27,7 @@ public class TaskConfiguration {
      */
     @Bean(TASK_EXECUTOR_NAME)
     public Executor taskExecutor() {
-        ServiceThreadPoolTaskExecutor
-                executor = new ServiceThreadPoolTaskExecutor();
+        ServiceThreadPoolTaskExecutor executor = new ServiceThreadPoolTaskExecutor();
         executor.setCorePoolSize(CPU_COUNT * 2);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(200);

@@ -27,5 +27,7 @@ jobs:
         uses: opentofu/setup-opentofu@v1.0.5
         with:
           tofu_version: 1.6.0
-      - name: Build
+      - name: Format check
+        run: mvn spotless:check &&  mvn checkstyle:check
+      - name: Build & Test
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify

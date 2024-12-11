@@ -5,21 +5,16 @@
 
 package org.eclipse.xpanse.tofu.maker.logging;
 
-
 import java.util.List;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Reads HTTP logging related configuration from spring context.
- */
-
+/** Reads HTTP logging related configuration from spring context. */
 @Configuration
 public class HttpLoggingConfig {
     private static boolean isHttpLoggingEnabled;
-    @Getter
-    private static List<String> excludedUris;
+    @Getter private static List<String> excludedUris;
 
     @Value("${http.logging.enabled:true}")
     public void setIsHttpLoggingEnabled(boolean isHttpLoggingEnabled) {
@@ -34,5 +29,4 @@ public class HttpLoggingConfig {
     public static boolean isHttpLoggingEnabled() {
         return isHttpLoggingEnabled;
     }
-
 }

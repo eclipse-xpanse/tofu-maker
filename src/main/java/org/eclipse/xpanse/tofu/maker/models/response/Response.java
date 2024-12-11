@@ -12,9 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Response for the REST API.
- */
+/** Response for the REST API. */
 @Data
 @JsonInclude(Include.NON_NULL)
 public class Response {
@@ -22,9 +20,11 @@ public class Response {
     @NotNull
     @Schema(description = "The result code of response.")
     private ResultType resultType;
+
     @NotNull
     @Schema(description = "Details of the errors occurred")
     private List<String> details;
+
     @NotNull
     @Schema(description = "Describes if the request is successful")
     private Boolean success;
@@ -33,7 +33,7 @@ public class Response {
      * Create error response with resultCode and errorMessage.
      *
      * @param resultCode error result code
-     * @param errMsg     error message
+     * @param errMsg error message
      * @return errorResponse
      */
     public static Response errorResponse(ResultType resultCode, List<String> errMsg) {
@@ -43,5 +43,4 @@ public class Response {
         response.details = errMsg;
         return response;
     }
-
 }

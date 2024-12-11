@@ -12,9 +12,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-/**
- * Main entry class to tofu-maker. This class can be directly executed to start the server.
- */
+/** Main entry class to tofu-maker. This class can be directly executed to start the server. */
 @EnableRetry
 @EnableAsync
 @EnableCaching
@@ -24,5 +22,4 @@ public class OpenTofuMakerApplication {
     public static void main(String[] args) {
         SpringApplication.run(OpenTofuMakerApplication.class, args);
     }
-
 }

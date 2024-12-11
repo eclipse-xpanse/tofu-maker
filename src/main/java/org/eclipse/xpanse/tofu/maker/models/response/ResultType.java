@@ -5,14 +5,11 @@
 
 package org.eclipse.xpanse.tofu.maker.models.response;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Result codes for the REST API.
- */
+/** Result codes for the REST API. */
 public enum ResultType {
     BAD_PARAMETERS("Parameters Invalid"),
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
@@ -31,17 +28,13 @@ public enum ResultType {
         this.value = value;
     }
 
-    /**
-     * For ResultType deserialize.
-     */
+    /** For ResultType deserialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
 
-    /**
-     * For ResultType serialize.
-     */
+    /** For ResultType serialize. */
     @JsonCreator
     public ResultType getByValue(String name) {
         for (ResultType resultType : values()) {
@@ -52,4 +45,3 @@ public enum ResultType {
         return null;
     }
 }
-

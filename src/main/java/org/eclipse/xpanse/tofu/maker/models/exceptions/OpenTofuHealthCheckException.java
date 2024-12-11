@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.tofu.maker.models.exceptions;
 
-/**
- * Used to indicate OpenTofu health check anomalies.
- */
+/** Used to indicate OpenTofu health check anomalies. */
 public class OpenTofuHealthCheckException extends RuntimeException {
 
     public OpenTofuHealthCheckException(String message) {
