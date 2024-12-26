@@ -36,7 +36,6 @@ import org.springframework.util.CollectionUtils;
 public class OpenTofuScriptsHelper {
 
     public static final String TF_SCRIPT_FILE_EXTENSION = ".tf";
-    private static final String TF_SCRIPT_FILE_NAME = "resource.tf";
     private static final String TF_STATE_FILE_NAME = "terraform.tfstate";
     private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
             Arrays.asList(".tf", ".tfstate", ".hcl");
@@ -86,27 +85,25 @@ public class OpenTofuScriptsHelper {
         }
     }
 
-
     /**
      * Prepare deployment files with scripts in the workspace for the OpenTofu deployment task.
      *
      * @param taskWorkspace workspace path for the OpenTofu deployment task.
-     * @param scripts       list of script contents as string.
+     * @param scriptsMap    map of script name as key, contents as value.
      * @param tfState       tfState file contents as string.
      * @return list of script files.
      */
     public List<File> prepareDeploymentFilesWithScripts(String taskWorkspace,
-                                                        List<String> scripts, String tfState) {
-        File scriptFile = buildScriptFiles(taskWorkspace, scripts);
-        List<File> scriptFiles = new ArrayList<>();
-        scriptFiles.add(scriptFile);
+                                                        Map<String, String> scriptsMap,
+                                                        String tfState) {
+        List<File> scriptFiles = buildScriptFiles(taskWorkspace, scriptsMap);
+        List<File> files = new ArrayList<>(scriptFiles);
         if (StringUtils.isNotBlank(tfState)) {
             File tfStateFile = createTfStateFile(taskWorkspace, tfState);
-            scriptFiles.add(tfStateFile);
+            files.add(tfStateFile);
         }
-        return scriptFiles;
+        return files;
     }
-
 
     /**
      * Prepare deployment files with git repo in the workspace for the OpenTofu deployment task.
@@ -116,8 +113,9 @@ public class OpenTofuScriptsHelper {
      * @param tfState        tfState file contents as string.
      * @return list of script files.
      */
-    public List<File> prepareDeploymentFilesWithGitRepo(
-            String taskWorkspace, OpenTofuScriptGitRepoDetails gitRepoDetails, String tfState) {
+    public List<File> prepareDeploymentFilesWithGitRepo(String taskWorkspace,
+                                                        OpenTofuScriptGitRepoDetails gitRepoDetails,
+                                                        String tfState) {
         List<File> scriptFiles =
                 scriptsGitRepoManage.checkoutScripts(taskWorkspace, gitRepoDetails);
         List<File> projectFiles = new ArrayList<>(scriptFiles);
@@ -129,24 +127,33 @@ public class OpenTofuScriptsHelper {
     }
 
 
-    private File buildScriptFiles(String taskWorkspace, List<String> scripts) {
+    private List<File> buildScriptFiles(String taskWorkspace, Map<String, String> scriptsMap) {
         log.info("start build OpenTofu script");
-        if (CollectionUtils.isEmpty(scripts)) {
-            throw new OpenTofuExecutorException("OpenTofu scripts create error, OpenTofu "
-                    + "scripts not exists");
+        if (Objects.isNull(scriptsMap) || scriptsMap.isEmpty()) {
+            throw new OpenTofuExecutorException(
+                    "OpenTofu scripts create error, scripts map is empty.");
         }
-        StringBuilder scriptBuilder = new StringBuilder();
-        for (String script : scripts) {
-            scriptBuilder.append(script).append(System.lineSeparator());
+        List<File> scriptFiles = new ArrayList<>();
+        for (Map.Entry<String, String> scriptEntry : scriptsMap.entrySet()) {
+            String scriptName = scriptEntry.getKey();
+            String scriptContent = scriptEntry.getValue();
+            if (StringUtils.isNotBlank(scriptName) && StringUtils.isNotBlank(scriptContent)) {
+                File scriptFile = createScriptFile(taskWorkspace, scriptName, scriptContent);
+                scriptFiles.add(scriptFile);
+            }
         }
-        if (scriptBuilder.isEmpty()) {
-            throw new OpenTofuExecutorException("OpenTofu scripts create error, OpenTofu "
-                    + "scripts content is empty");
+        if (CollectionUtils.isEmpty(scriptFiles)) {
+            throw new OpenTofuExecutorException(
+                    "OpenTofu scripts create error, all scripts is empty.");
         }
-        File scriptFile = new File(taskWorkspace, TF_SCRIPT_FILE_NAME);
+        return scriptFiles;
+    }
+
+    private File createScriptFile(String taskWorkspace, String scriptName, String scriptContent) {
+        File scriptFile = new File(taskWorkspace, scriptName);
         boolean overwrite = scriptFile.exists();
         try (FileWriter scriptWriter = new FileWriter(scriptFile, overwrite)) {
-            scriptWriter.write(scriptBuilder.toString());
+            scriptWriter.write(scriptContent);
             log.info("OpenTofu script create success, fileName: {}", scriptFile.getAbsolutePath());
             return scriptFile;
         } catch (IOException ex) {
@@ -247,12 +254,11 @@ public class OpenTofuScriptsHelper {
         if (cleanWorkspaceAfterDeployment) {
             Path path = Paths.get(taskWorkspace).toAbsolutePath().normalize();
             try (Stream<Path> pathStream = Files.walk(path)) {
-                pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile)
-                        .forEach(file -> {
-                            if (!file.delete()) {
-                                log.error("Failed to delete file {}.", file.getAbsolutePath());
-                            }
-                        });
+                pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(file -> {
+                    if (!file.delete()) {
+                        log.error("Failed to delete file {}.", file.getAbsolutePath());
+                    }
+                });
             } catch (IOException e) {
                 log.error("Delete task workspace:{} error", taskWorkspace, e);
             }
@@ -265,7 +271,7 @@ public class OpenTofuScriptsHelper {
     }
 
     private String getModuleParentDirectoryPath() {
-        return StringUtils.isNotBlank(moduleParentDirectoryPath)
-                ? moduleParentDirectoryPath : System.getProperty("java.io.tmpdir");
+        return StringUtils.isNotBlank(moduleParentDirectoryPath) ? moduleParentDirectoryPath
+                : System.getProperty("java.io.tmpdir");
     }
 }

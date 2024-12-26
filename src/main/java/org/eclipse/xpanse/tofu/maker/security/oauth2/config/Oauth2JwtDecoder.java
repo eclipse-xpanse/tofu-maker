@@ -37,8 +37,8 @@ public class Oauth2JwtDecoder {
      * @return JwtDecoder.
      */
     @Retryable(retryFor = Exception.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${spring.retry.max-attempts}",
+            backoff = @Backoff(delayExpression = "${spring.retry.delay-millions}"))
     public JwtDecoder createJwtDecoder(String issuerUri) {
         int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
                 ? 0 : RetrySynchronizationManager.getContext().getRetryCount();

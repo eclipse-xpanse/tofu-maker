@@ -6,8 +6,9 @@
 package org.eclipse.xpanse.tofu.maker.models.request.scripts;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,8 +25,11 @@ public class OpenTofuDestroyWithScriptsRequest extends OpenTofuDestroyFromDirect
     private UUID requestId;
 
     @NotNull
-    @Schema(description = "List of script files for destroy requests deployed via scripts")
-    private List<String> scripts;
+    @NotEmpty
+    @Schema(
+            description =
+                    "Map stores file name and content of all script files for destroy request")
+    private Map<String, String> scriptFiles;
 
     @NotNull
     @Schema(description = "The .tfState file content after deployment")

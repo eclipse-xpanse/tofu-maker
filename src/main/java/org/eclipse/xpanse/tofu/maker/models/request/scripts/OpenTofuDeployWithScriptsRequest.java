@@ -6,8 +6,9 @@
 package org.eclipse.xpanse.tofu.maker.models.request.scripts;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFromDirectoryRequest;
@@ -20,7 +21,10 @@ import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFrom
 public class OpenTofuDeployWithScriptsRequest extends OpenTofuDeployFromDirectoryRequest {
 
     @NotNull
-    @Schema(description = "List of OpenTofu script files to be considered for deploying changes.")
-    private List<String> scripts;
+    @NotEmpty
+    @Schema(
+            description =
+                    "Map stores file name and content of all script files for deploy request.")
+    private Map<String, String> scriptFiles;
 
 }
