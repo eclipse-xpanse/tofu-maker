@@ -6,8 +6,9 @@
 package org.eclipse.xpanse.tofu.maker.models.plan;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,8 +20,11 @@ import lombok.EqualsAndHashCode;
 public class OpenTofuPlanWithScriptsRequest extends OpenTofuPlanFromDirectoryRequest {
 
     @NotNull
-    @Schema(description =
-            "List of openTofu script files to be considered for generating openTofu plan")
-    private List<String> scripts;
+    @NotEmpty
+    @Schema(
+            description =
+                    "Map stores file name and content of all script files for generating terraform"
+                            + " plan.")
+    private Map<String, String> scriptFiles;
 
 }

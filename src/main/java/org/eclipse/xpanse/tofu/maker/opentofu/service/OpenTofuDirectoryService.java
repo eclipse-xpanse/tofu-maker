@@ -11,6 +11,7 @@ import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.tofu.maker.async.TaskConfiguration;
@@ -44,6 +45,8 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Service
 public class OpenTofuDirectoryService {
+
+    private static final String HELLO_WORLD_TF_NAME = "hello_world.tf";
     private static final String HELLO_WORLD_TEMPLATE = """
             output "hello_world" {
                 value = "Hello, World!"
@@ -71,7 +74,7 @@ public class OpenTofuDirectoryService {
     public OpenTofuMakerSystemStatus tfHealthCheck() {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(UUID.randomUUID().toString());
         scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace,
-                List.of(HELLO_WORLD_TEMPLATE), null);
+                Map.of(HELLO_WORLD_TF_NAME, HELLO_WORLD_TEMPLATE), null);
         OpenTofuValidationResult openTofuValidationResult =
                 tfValidateFromDirectory(taskWorkspace, null);
         OpenTofuMakerSystemStatus systemStatus = new OpenTofuMakerSystemStatus();
@@ -207,8 +210,7 @@ public class OpenTofuDirectoryService {
                 request.getEnvVariables(), taskWorkspace);
         scriptsHelper.deleteTaskWorkspace(taskWorkspace);
         OpenTofuPlan openTofuPlan = OpenTofuPlan.builder().plan(result).build();
-        openTofuPlan.setOpenTofuVersionUsed(
-                versionHelper.getExactVersionOfExecutor(executorPath));
+        openTofuPlan.setOpenTofuVersionUsed(versionHelper.getExactVersionOfExecutor(executorPath));
         return openTofuPlan;
     }
 
@@ -222,10 +224,9 @@ public class OpenTofuDirectoryService {
         try {
             result = deployFromDirectory(asyncDeployRequest, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
@@ -243,10 +244,9 @@ public class OpenTofuDirectoryService {
         try {
             result = modifyFromDirectory(asyncModifyRequest, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
@@ -264,10 +264,9 @@ public class OpenTofuDirectoryService {
         try {
             result = destroyFromDirectory(request, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
@@ -283,9 +282,11 @@ public class OpenTofuDirectoryService {
         }
     }
 
-    private OpenTofuResult transSystemCmdResultToOpenTofuResult(
-            SystemCmdResult result, String taskWorkspace, List<File> scriptFiles) {
-        OpenTofuResult openTofuResult = OpenTofuResult.builder().build();
+    private OpenTofuResult transSystemCmdResultToOpenTofuResult(SystemCmdResult result,
+                                                                String taskWorkspace,
+                                                                List<File> scriptFiles) {
+        OpenTofuResult openTofuResult =
+                OpenTofuResult.builder().isCommandSuccessful(result.isCommandSuccessful()).build();
         BeanUtils.copyProperties(result, openTofuResult);
         openTofuResult.setTerraformState(scriptsHelper.getTerraformState(taskWorkspace));
         openTofuResult.setGeneratedFileContentMap(

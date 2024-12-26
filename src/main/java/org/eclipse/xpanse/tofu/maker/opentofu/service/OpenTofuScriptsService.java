@@ -47,10 +47,10 @@ public class OpenTofuScriptsService {
      * /**
      * Method of deployment a service using a script.
      */
-    public OpenTofuValidationResult validateWithScripts(
-            OpenTofuDeployWithScriptsRequest request) {
+    public OpenTofuValidationResult validateWithScripts(OpenTofuDeployWithScriptsRequest request) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(UUID.randomUUID().toString());
-        scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScripts(), null);
+        scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScriptFiles(),
+                null);
         return directoryService.tfValidateFromDirectory(taskWorkspace,
                 request.getOpenTofuVersion());
     }
@@ -60,9 +60,8 @@ public class OpenTofuScriptsService {
      */
     public OpenTofuResult deployWithScripts(OpenTofuDeployWithScriptsRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> files =
-                scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScripts(),
-                        null);
+        List<File> files = scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace,
+                request.getScriptFiles(), null);
         return directoryService.deployFromDirectory(request, taskWorkspace, files);
     }
 
@@ -71,21 +70,18 @@ public class OpenTofuScriptsService {
      */
     public OpenTofuResult modifyWithScripts(OpenTofuModifyWithScriptsRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> files =
-                scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScripts(),
-                        request.getTfState());
+        List<File> files = scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace,
+                request.getScriptFiles(), request.getTfState());
         return directoryService.modifyFromDirectory(request, taskWorkspace, files);
     }
 
     /**
      * Method of destroy a service using a script.
      */
-    public OpenTofuResult destroyWithScripts(OpenTofuDestroyWithScriptsRequest request,
-                                             UUID uuid) {
+    public OpenTofuResult destroyWithScripts(OpenTofuDestroyWithScriptsRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> files =
-                scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScripts(),
-                        request.getTfState());
+        List<File> files = scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace,
+                request.getScriptFiles(), request.getTfState());
         return directoryService.destroyFromDirectory(request, taskWorkspace, files);
     }
 
@@ -95,7 +91,8 @@ public class OpenTofuScriptsService {
     public OpenTofuPlan getOpenTofuPlanFromScripts(OpenTofuPlanWithScriptsRequest request,
                                                    UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScripts(), null);
+        scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace, request.getScriptFiles(),
+                null);
         return directoryService.getOpenTofuPlanFromDirectory(request, uuid.toString());
     }
 
@@ -109,10 +106,9 @@ public class OpenTofuScriptsService {
         try {
             result = deployWithScripts(asyncDeployRequest, uuid);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
@@ -130,10 +126,9 @@ public class OpenTofuScriptsService {
         try {
             result = modifyWithScripts(asyncModifyRequest, uuid);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
@@ -145,16 +140,14 @@ public class OpenTofuScriptsService {
      * Async destroy resource of the service.
      */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromScriptsRequest request,
-                                        UUID uuid) {
+    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromScriptsRequest request, UUID uuid) {
         OpenTofuResult result;
         try {
             result = destroyWithScripts(request, uuid);
         } catch (RuntimeException e) {
-            result =
-                    OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                            .isCommandSuccessful(false).terraformState(null)
-                            .generatedFileContentMap(new HashMap<>()).build();
+            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
+                    .isCommandSuccessful(false).terraformState(null)
+                    .generatedFileContentMap(new HashMap<>()).build();
         }
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
