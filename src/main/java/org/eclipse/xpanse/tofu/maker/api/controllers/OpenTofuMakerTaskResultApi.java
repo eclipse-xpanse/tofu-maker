@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.tofu.maker.api.controllers;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,29 +22,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for manage the task form tofu-maker.
- */
+/** REST controller for manage the task form tofu-maker. */
 @Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/tofu-maker/task")
 public class OpenTofuMakerTaskResultApi {
 
-    @Resource
-    private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
+    @Resource private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
 
-    @Tag(name = "RetrieveOpenTofuResult", description =
-            "APIs for manage the task form tofu-maker.")
-    @Operation(description = "Method to retrieve stored openTofu result in case tofu-maker "
-            + "receives a failure while sending the openTofu result via callback.")
-    @GetMapping(value = "/result/{requestId}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "RetrieveOpenTofuResult", description = "APIs for manage the task form tofu-maker.")
+    @Operation(
+            description =
+                    "Method to retrieve stored openTofu result in case tofu-maker "
+                            + "receives a failure while sending the openTofu result via callback.")
+    @GetMapping(value = "/result/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<OpenTofuResult> getStoredTaskResultByRequestId(
-            @Parameter(name = "requestId",
-                    description = "id of the request")
-            @PathVariable("requestId") String requestId) {
+            @Parameter(name = "requestId", description = "id of the request")
+                    @PathVariable("requestId")
+                    String requestId) {
         return openTofuResultPersistenceManage.retrieveOpenTofuResultByRequestId(requestId);
     }
 }

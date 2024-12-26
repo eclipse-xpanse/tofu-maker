@@ -39,32 +39,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * OpenTofu service classes are deployed form Directory.
- */
+/** OpenTofu service classes are deployed form Directory. */
 @Slf4j
 @Service
 public class OpenTofuDirectoryService {
 
     private static final String HELLO_WORLD_TF_NAME = "hello_world.tf";
-    private static final String HELLO_WORLD_TEMPLATE = """
+    private static final String HELLO_WORLD_TEMPLATE =
+            """
             output "hello_world" {
                 value = "Hello, World!"
             }
             """;
-    @Resource
-    private OpenTofuExecutor executor;
-    @Resource
-    private OpenTofuInstaller installer;
-    @Resource
-    private RestTemplate restTemplate;
-    @Resource
-    private OpenTofuVersionsHelper versionHelper;
-    @Resource
-    private OpenTofuScriptsHelper scriptsHelper;
-    @Resource
-    private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
-
+    @Resource private OpenTofuExecutor executor;
+    @Resource private OpenTofuInstaller installer;
+    @Resource private RestTemplate restTemplate;
+    @Resource private OpenTofuVersionsHelper versionHelper;
+    @Resource private OpenTofuScriptsHelper scriptsHelper;
+    @Resource private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
 
     /**
      * Perform OpenTofu health checks by creating a OpenTofu test configuration file.
@@ -73,8 +65,8 @@ public class OpenTofuDirectoryService {
      */
     public OpenTofuMakerSystemStatus tfHealthCheck() {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(UUID.randomUUID().toString());
-        scriptsHelper.prepareDeploymentFilesWithScripts(taskWorkspace,
-                Map.of(HELLO_WORLD_TF_NAME, HELLO_WORLD_TEMPLATE), null);
+        scriptsHelper.prepareDeploymentFilesWithScripts(
+                taskWorkspace, Map.of(HELLO_WORLD_TF_NAME, HELLO_WORLD_TEMPLATE), null);
         OpenTofuValidationResult openTofuValidationResult =
                 tfValidateFromDirectory(taskWorkspace, null);
         OpenTofuMakerSystemStatus systemStatus = new OpenTofuMakerSystemStatus();
@@ -92,15 +84,16 @@ public class OpenTofuDirectoryService {
      *
      * @return TfValidationResult.
      */
-    public OpenTofuValidationResult tfValidateFromDirectory(String taskWorkspace,
-                                                            String openTofuVersion) {
+    public OpenTofuValidationResult tfValidateFromDirectory(
+            String taskWorkspace, String openTofuVersion) {
         try {
             String executorPath =
                     installer.getExecutorPathThatMatchesRequiredVersion(openTofuVersion);
             SystemCmdResult result = executor.tfValidate(executorPath, taskWorkspace);
             OpenTofuValidationResult validationResult =
-                    new ObjectMapper().readValue(result.getCommandStdOutput(),
-                            OpenTofuValidationResult.class);
+                    new ObjectMapper()
+                            .readValue(
+                                    result.getCommandStdOutput(), OpenTofuValidationResult.class);
             validationResult.setOpenTofuVersionUsed(
                     versionHelper.getExactVersionOfExecutor(executorPath));
             return validationResult;
@@ -109,22 +102,31 @@ public class OpenTofuDirectoryService {
         }
     }
 
-    /**
-     * Deploy a source by openTofu.
-     */
-    public OpenTofuResult deployFromDirectory(OpenTofuDeployFromDirectoryRequest request,
-                                              String taskWorkspace, List<File> scriptFiles) {
+    /** Deploy a source by openTofu. */
+    public OpenTofuResult deployFromDirectory(
+            OpenTofuDeployFromDirectoryRequest request,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         SystemCmdResult result;
         String executorPath = null;
         try {
-            executorPath = installer.getExecutorPathThatMatchesRequiredVersion(
-                    request.getOpenTofuVersion());
+            executorPath =
+                    installer.getExecutorPathThatMatchesRequiredVersion(
+                            request.getOpenTofuVersion());
             if (Boolean.TRUE.equals(request.getIsPlanOnly())) {
-                result = executor.tfPlan(executorPath, request.getVariables(),
-                        request.getEnvVariables(), taskWorkspace);
+                result =
+                        executor.tfPlan(
+                                executorPath,
+                                request.getVariables(),
+                                request.getEnvVariables(),
+                                taskWorkspace);
             } else {
-                result = executor.tfApply(executorPath, request.getVariables(),
-                        request.getEnvVariables(), taskWorkspace);
+                result =
+                        executor.tfApply(
+                                executorPath,
+                                request.getVariables(),
+                                request.getEnvVariables(),
+                                taskWorkspace);
             }
         } catch (InvalidOpenTofuToolException | OpenTofuExecutorException tfEx) {
             log.error("OpenTofu deploy service failed. error:{}", tfEx.getMessage());
@@ -140,22 +142,31 @@ public class OpenTofuDirectoryService {
         return openTofuResult;
     }
 
-    /**
-     * Modify a source by openTofu.
-     */
-    public OpenTofuResult modifyFromDirectory(OpenTofuModifyFromDirectoryRequest request,
-                                              String taskWorkspace, List<File> scriptFiles) {
+    /** Modify a source by openTofu. */
+    public OpenTofuResult modifyFromDirectory(
+            OpenTofuModifyFromDirectoryRequest request,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         SystemCmdResult result;
         String executorPath = null;
         try {
-            executorPath = installer.getExecutorPathThatMatchesRequiredVersion(
-                    request.getOpenTofuVersion());
+            executorPath =
+                    installer.getExecutorPathThatMatchesRequiredVersion(
+                            request.getOpenTofuVersion());
             if (Boolean.TRUE.equals(request.getIsPlanOnly())) {
-                result = executor.tfPlan(executorPath, request.getVariables(),
-                        request.getEnvVariables(), taskWorkspace);
+                result =
+                        executor.tfPlan(
+                                executorPath,
+                                request.getVariables(),
+                                request.getEnvVariables(),
+                                taskWorkspace);
             } else {
-                result = executor.tfApply(executorPath, request.getVariables(),
-                        request.getEnvVariables(), taskWorkspace);
+                result =
+                        executor.tfApply(
+                                executorPath,
+                                request.getVariables(),
+                                request.getEnvVariables(),
+                                taskWorkspace);
             }
         } catch (InvalidOpenTofuToolException | OpenTofuExecutorException tfEx) {
             log.error("OpenTofu deploy service failed. error:{}", tfEx.getMessage());
@@ -172,18 +183,23 @@ public class OpenTofuDirectoryService {
         return openTofuResult;
     }
 
-    /**
-     * Destroy resource of the service.
-     */
-    public OpenTofuResult destroyFromDirectory(OpenTofuDestroyFromDirectoryRequest request,
-                                               String taskWorkspace, List<File> scriptFiles) {
+    /** Destroy resource of the service. */
+    public OpenTofuResult destroyFromDirectory(
+            OpenTofuDestroyFromDirectoryRequest request,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         SystemCmdResult result;
         String executorPath = null;
         try {
-            executorPath = installer.getExecutorPathThatMatchesRequiredVersion(
-                    request.getOpenTofuVersion());
-            result = executor.tfDestroy(executorPath, request.getVariables(),
-                    request.getEnvVariables(), taskWorkspace);
+            executorPath =
+                    installer.getExecutorPathThatMatchesRequiredVersion(
+                            request.getOpenTofuVersion());
+            result =
+                    executor.tfDestroy(
+                            executorPath,
+                            request.getVariables(),
+                            request.getEnvVariables(),
+                            taskWorkspace);
         } catch (InvalidOpenTofuToolException | OpenTofuExecutorException tfEx) {
             log.error("OpenTofu destroy service failed. error:{}", tfEx.getMessage());
             result = new SystemCmdResult();
@@ -199,34 +215,41 @@ public class OpenTofuDirectoryService {
         return openTofuResult;
     }
 
-    /**
-     * Executes openTofu plan command on a directory and returns the plan as a JSON string.
-     */
-    public OpenTofuPlan getOpenTofuPlanFromDirectory(OpenTofuPlanFromDirectoryRequest request,
-                                                     String taskWorkspace) {
+    /** Executes openTofu plan command on a directory and returns the plan as a JSON string. */
+    public OpenTofuPlan getOpenTofuPlanFromDirectory(
+            OpenTofuPlanFromDirectoryRequest request, String taskWorkspace) {
         String executorPath =
                 installer.getExecutorPathThatMatchesRequiredVersion(request.getOpenTofuVersion());
-        String result = executor.getOpenTofuPlanAsJson(executorPath, request.getVariables(),
-                request.getEnvVariables(), taskWorkspace);
+        String result =
+                executor.getOpenTofuPlanAsJson(
+                        executorPath,
+                        request.getVariables(),
+                        request.getEnvVariables(),
+                        taskWorkspace);
         scriptsHelper.deleteTaskWorkspace(taskWorkspace);
         OpenTofuPlan openTofuPlan = OpenTofuPlan.builder().plan(result).build();
         openTofuPlan.setOpenTofuVersionUsed(versionHelper.getExactVersionOfExecutor(executorPath));
         return openTofuPlan;
     }
 
-    /**
-     * Async deploy a source by openTofu.
-     */
+    /** Async deploy a source by openTofu. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDeployWithScripts(OpenTofuAsyncDeployFromDirectoryRequest asyncDeployRequest,
-                                       String taskWorkspace, List<File> scriptFiles) {
+    public void asyncDeployWithScripts(
+            OpenTofuAsyncDeployFromDirectoryRequest asyncDeployRequest,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         OpenTofuResult result;
         try {
             result = deployFromDirectory(asyncDeployRequest, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                    .isCommandSuccessful(false).terraformState(null)
-                    .generatedFileContentMap(new HashMap<>()).build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
@@ -234,19 +257,24 @@ public class OpenTofuDirectoryService {
         sendOpenTofuResult(url, result);
     }
 
-    /**
-     * Async modify a source by openTofu.
-     */
+    /** Async modify a source by openTofu. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncModifyWithScripts(OpenTofuAsyncModifyFromDirectoryRequest asyncModifyRequest,
-                                       String taskWorkspace, List<File> scriptFiles) {
+    public void asyncModifyWithScripts(
+            OpenTofuAsyncModifyFromDirectoryRequest asyncModifyRequest,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         OpenTofuResult result;
         try {
             result = modifyFromDirectory(asyncModifyRequest, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                    .isCommandSuccessful(false).terraformState(null)
-                    .generatedFileContentMap(new HashMap<>()).build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
@@ -254,19 +282,24 @@ public class OpenTofuDirectoryService {
         sendOpenTofuResult(url, result);
     }
 
-    /**
-     * Async destroy resource of the service.
-     */
+    /** Async destroy resource of the service. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromDirectoryRequest request,
-                                        String taskWorkspace, List<File> scriptFiles) {
+    public void asyncDestroyWithScripts(
+            OpenTofuAsyncDestroyFromDirectoryRequest request,
+            String taskWorkspace,
+            List<File> scriptFiles) {
         OpenTofuResult result;
         try {
             result = destroyFromDirectory(request, taskWorkspace, scriptFiles);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder().commandStdOutput(null).commandStdError(e.getMessage())
-                    .isCommandSuccessful(false).terraformState(null)
-                    .generatedFileContentMap(new HashMap<>()).build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
@@ -282,9 +315,8 @@ public class OpenTofuDirectoryService {
         }
     }
 
-    private OpenTofuResult transSystemCmdResultToOpenTofuResult(SystemCmdResult result,
-                                                                String taskWorkspace,
-                                                                List<File> scriptFiles) {
+    private OpenTofuResult transSystemCmdResultToOpenTofuResult(
+            SystemCmdResult result, String taskWorkspace, List<File> scriptFiles) {
         OpenTofuResult openTofuResult =
                 OpenTofuResult.builder().isCommandSuccessful(result.isCommandSuccessful()).build();
         BeanUtils.copyProperties(result, openTofuResult);

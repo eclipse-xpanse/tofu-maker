@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * bean to host all generic methods shared from different types of OpenTofu deployers.
- */
+/** bean to host all generic methods shared from different types of OpenTofu deployers. */
 @Slf4j
 @Component
 public class OpenTofuScriptsHelper {
@@ -42,11 +40,11 @@ public class OpenTofuScriptsHelper {
 
     @Value("${opentofu.root.module.directory}")
     private String moduleParentDirectoryPath;
+
     @Value("${clean.workspace.after.deployment.enabled:true}")
     private Boolean cleanWorkspaceAfterDeployment;
-    @Resource
-    private ScriptsGitRepoManage scriptsGitRepoManage;
 
+    @Resource private ScriptsGitRepoManage scriptsGitRepoManage;
 
     /**
      * Create workspace for the OpenTofu deployment task.
@@ -67,7 +65,7 @@ public class OpenTofuScriptsHelper {
      * Create the tfstate file in the taskWorkspace for the OpenTofu deployment task.
      *
      * @param taskWorkspace taskWorkspace path for the OpenTofu deployment task.
-     * @param tfState       state file contents as string.
+     * @param tfState state file contents as string.
      */
     public File createTfStateFile(String taskWorkspace, String tfState) {
         if (StringUtils.isBlank(tfState)) {
@@ -89,13 +87,12 @@ public class OpenTofuScriptsHelper {
      * Prepare deployment files with scripts in the workspace for the OpenTofu deployment task.
      *
      * @param taskWorkspace workspace path for the OpenTofu deployment task.
-     * @param scriptsMap    map of script name as key, contents as value.
-     * @param tfState       tfState file contents as string.
+     * @param scriptsMap map of script name as key, contents as value.
+     * @param tfState tfState file contents as string.
      * @return list of script files.
      */
-    public List<File> prepareDeploymentFilesWithScripts(String taskWorkspace,
-                                                        Map<String, String> scriptsMap,
-                                                        String tfState) {
+    public List<File> prepareDeploymentFilesWithScripts(
+            String taskWorkspace, Map<String, String> scriptsMap, String tfState) {
         List<File> scriptFiles = buildScriptFiles(taskWorkspace, scriptsMap);
         List<File> files = new ArrayList<>(scriptFiles);
         if (StringUtils.isNotBlank(tfState)) {
@@ -108,14 +105,13 @@ public class OpenTofuScriptsHelper {
     /**
      * Prepare deployment files with git repo in the workspace for the OpenTofu deployment task.
      *
-     * @param taskWorkspace  workspace path for the OpenTofu deployment task.
+     * @param taskWorkspace workspace path for the OpenTofu deployment task.
      * @param gitRepoDetails git repo details.
-     * @param tfState        tfState file contents as string.
+     * @param tfState tfState file contents as string.
      * @return list of script files.
      */
-    public List<File> prepareDeploymentFilesWithGitRepo(String taskWorkspace,
-                                                        OpenTofuScriptGitRepoDetails gitRepoDetails,
-                                                        String tfState) {
+    public List<File> prepareDeploymentFilesWithGitRepo(
+            String taskWorkspace, OpenTofuScriptGitRepoDetails gitRepoDetails, String tfState) {
         List<File> scriptFiles =
                 scriptsGitRepoManage.checkoutScripts(taskWorkspace, gitRepoDetails);
         List<File> projectFiles = new ArrayList<>(scriptFiles);
@@ -125,7 +121,6 @@ public class OpenTofuScriptsHelper {
         }
         return projectFiles;
     }
-
 
     private List<File> buildScriptFiles(String taskWorkspace, Map<String, String> scriptsMap) {
         log.info("start build OpenTofu script");
@@ -181,7 +176,6 @@ public class OpenTofuScriptsHelper {
         return state;
     }
 
-
     /**
      * Get the list of files in the workspace for the OpenTofu deployment task.
      *
@@ -194,11 +188,13 @@ public class OpenTofuScriptsHelper {
         if (workPath.isDirectory() && workPath.exists()) {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile()) {
-                        scriptFiles.add(file);
-                    }
-                });
+                Arrays.stream(files)
+                        .forEach(
+                                file -> {
+                                    if (file.isFile()) {
+                                        scriptFiles.add(file);
+                                    }
+                                });
             }
         }
         return scriptFiles;
@@ -209,23 +205,26 @@ public class OpenTofuScriptsHelper {
      * deployment task.
      *
      * @param taskWorkspace workspace path for the OpenTofu deployment task.
-     * @param scriptFiles   List of script files.
+     * @param scriptFiles List of script files.
      * @return Map of file name and file content.
      */
-    public Map<String, String> getDeploymentGeneratedFilesContent(String taskWorkspace,
-                                                                  List<File> scriptFiles) {
+    public Map<String, String> getDeploymentGeneratedFilesContent(
+            String taskWorkspace, List<File> scriptFiles) {
         Map<String, String> fileContentMap = new HashMap<>();
         File workPath = new File(taskWorkspace);
         if (workPath.isDirectory() && workPath.exists()) {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile() && !isExcludedFile(file.getName())
-                            && !scriptFiles.contains(file)) {
-                        String content = readFileContentAndDelete(file);
-                        fileContentMap.put(file.getName(), content);
-                    }
-                });
+                Arrays.stream(files)
+                        .forEach(
+                                file -> {
+                                    if (file.isFile()
+                                            && !isExcludedFile(file.getName())
+                                            && !scriptFiles.contains(file)) {
+                                        String content = readFileContentAndDelete(file);
+                                        fileContentMap.put(file.getName(), content);
+                                    }
+                                });
             }
         }
         return fileContentMap;
@@ -236,14 +235,15 @@ public class OpenTofuScriptsHelper {
         try {
             fileContent = Files.readString(file.toPath());
             boolean deleted = Files.deleteIfExists(file.toPath());
-            log.info("Read file content with name:{} successfully. Delete result：{}",
-                    file.getName(), deleted);
+            log.info(
+                    "Read file content with name:{} successfully. Delete result：{}",
+                    file.getName(),
+                    deleted);
         } catch (IOException e) {
             log.error("Read file content with name:{} error.", file.getName(), e);
         }
         return fileContent;
     }
-
 
     /**
      * Delete the workspace of the OpenTofu deployment task.
@@ -254,11 +254,17 @@ public class OpenTofuScriptsHelper {
         if (cleanWorkspaceAfterDeployment) {
             Path path = Paths.get(taskWorkspace).toAbsolutePath().normalize();
             try (Stream<Path> pathStream = Files.walk(path)) {
-                pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(file -> {
-                    if (!file.delete()) {
-                        log.error("Failed to delete file {}.", file.getAbsolutePath());
-                    }
-                });
+                pathStream
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(
+                                file -> {
+                                    if (!file.delete()) {
+                                        log.error(
+                                                "Failed to delete file {}.",
+                                                file.getAbsolutePath());
+                                    }
+                                });
             } catch (IOException e) {
                 log.error("Delete task workspace:{} error", taskWorkspace, e);
             }
@@ -271,7 +277,8 @@ public class OpenTofuScriptsHelper {
     }
 
     private String getModuleParentDirectoryPath() {
-        return StringUtils.isNotBlank(moduleParentDirectoryPath) ? moduleParentDirectoryPath
+        return StringUtils.isNotBlank(moduleParentDirectoryPath)
+                ? moduleParentDirectoryPath
                 : System.getProperty("java.io.tmpdir");
     }
 }

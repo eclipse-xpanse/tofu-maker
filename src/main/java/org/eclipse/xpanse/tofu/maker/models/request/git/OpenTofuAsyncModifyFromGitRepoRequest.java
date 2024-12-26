@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.webhook.WebhookConfig;
 
-/**
- * Data model for open tofu async modify requests using scripts from a GIT Repo.
- */
+/** Data model for open tofu async modify requests using scripts from a GIT Repo. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuAsyncModifyFromGitRepoRequest extends OpenTofuModifyFromGitRepoRequest {
@@ -21,5 +19,4 @@ public class OpenTofuAsyncModifyFromGitRepoRequest extends OpenTofuModifyFromGit
     @NotNull
     @Schema(description = "Configuration information of webhook.")
     private WebhookConfig webhookConfig;
-
 }

@@ -22,66 +22,51 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-/**
- * Exception handler for exceptions thrown by the methods called by the API controller.
- */
+/** Exception handler for exceptions thrown by the methods called by the API controller. */
 @Slf4j
 @RestControllerAdvice
 public class OpenTofuApiExceptionHandler {
 
-    /**
-     * Exception handler for IllegalArgumentException.
-     */
+    /** Exception handler for IllegalArgumentException. */
     @ExceptionHandler({IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("handleIllegalArgumentException: ", ex);
-        return Response.errorResponse(ResultType.OPENTOFU_EXECUTION_FAILED,
-                Collections.singletonList(ex.getMessage()));
+        return Response.errorResponse(
+                ResultType.OPENTOFU_EXECUTION_FAILED, Collections.singletonList(ex.getMessage()));
     }
 
-
-    /**
-     * Exception handler for OpenTofuExecutorException.
-     */
+    /** Exception handler for OpenTofuExecutorException. */
     @ExceptionHandler({OpenTofuExecutorException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ResponseBody
-    public Response handleOpenTofuExecutorException(
-            OpenTofuExecutorException ex) {
+    public Response handleOpenTofuExecutorException(OpenTofuExecutorException ex) {
         log.error("handleOpenTofuExecutorException: ", ex);
-        return Response.errorResponse(ResultType.OPENTOFU_EXECUTION_FAILED,
-                Collections.singletonList(ex.getMessage()));
+        return Response.errorResponse(
+                ResultType.OPENTOFU_EXECUTION_FAILED, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for UnsupportedEnumValueException.
-     */
+    /** Exception handler for UnsupportedEnumValueException. */
     @ExceptionHandler({UnsupportedEnumValueException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleUnsupportedEnumValueException(
-            UnsupportedEnumValueException ex) {
-        return Response.errorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
-                Collections.singletonList(ex.getMessage()));
+    public Response handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
+        return Response.errorResponse(
+                ResultType.UNSUPPORTED_ENUM_VALUE, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for MethodArgumentTypeMismatchException.
-     */
+    /** Exception handler for MethodArgumentTypeMismatchException. */
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
-        return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
-                Collections.singletonList(ex.getMessage()));
+        return Response.errorResponse(
+                ResultType.UNPROCESSABLE_ENTITY, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for MethodArgumentNotValidException.
-     */
+    /** Exception handler for MethodArgumentNotValidException. */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
@@ -95,76 +80,62 @@ public class OpenTofuApiExceptionHandler {
         return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
     }
 
-    /**
-     * Exception handler for HttpMessageConversionException.
-     */
+    /** Exception handler for HttpMessageConversionException. */
     @ExceptionHandler({HttpMessageConversionException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS,
-                Collections.singletonList(failMessage));
+        return Response.errorResponse(
+                ResultType.BAD_PARAMETERS, Collections.singletonList(failMessage));
     }
 
-    /**
-     * Exception handler for OpenTofuHealthCheckException.
-     */
+    /** Exception handler for OpenTofuHealthCheckException. */
     @ExceptionHandler({OpenTofuHealthCheckException.class})
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public Response handleOpenTofuHealthCheckException(OpenTofuHealthCheckException ex) {
         log.error("OpenTofuHealthCheckException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.SERVICE_UNAVAILABLE,
-                Collections.singletonList(failMessage));
+        return Response.errorResponse(
+                ResultType.SERVICE_UNAVAILABLE, Collections.singletonList(failMessage));
     }
 
-    /**
-     * Exception handler for GitRepoCloneException.
-     */
+    /** Exception handler for GitRepoCloneException. */
     @ExceptionHandler({GitRepoCloneException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleGitRepoCloneException(GitRepoCloneException ex) {
         log.error("GitRepoCloneException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
-                Collections.singletonList(failMessage));
+        return Response.errorResponse(
+                ResultType.INVALID_GIT_REPO_DETAILS, Collections.singletonList(failMessage));
     }
 
-    /**
-     * Exception handler for InvalidOpenTofuToolException.
-     */
+    /** Exception handler for InvalidOpenTofuToolException. */
     @ExceptionHandler({InvalidOpenTofuToolException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleInvalidOpenTofuToolException(
-            InvalidOpenTofuToolException ex) {
-        return Response.errorResponse(ResultType.INVALID_OPENTOFU_TOOL,
-                Collections.singletonList(ex.getMessage()));
+    public Response handleInvalidOpenTofuToolException(InvalidOpenTofuToolException ex) {
+        return Response.errorResponse(
+                ResultType.INVALID_OPENTOFU_TOOL, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for InvalidOpenTofuScriptsException.
-     */
+    /** Exception handler for InvalidOpenTofuScriptsException. */
     @ExceptionHandler({InvalidOpenTofuScriptsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleInvalidOpenTofuScriptsException(
-            InvalidOpenTofuScriptsException ex) {
-        return Response.errorResponse(ResultType.INVALID_OPENTOFU_SCRIPTS,
-                Collections.singletonList(ex.getMessage()));
+    public Response handleInvalidOpenTofuScriptsException(InvalidOpenTofuScriptsException ex) {
+        return Response.errorResponse(
+                ResultType.INVALID_OPENTOFU_SCRIPTS, Collections.singletonList(ex.getMessage()));
     }
 
-
-    /**
-     * Exception handler for ResultAlreadyReturnedOrRequestIdInvalidException.
-     */
+    /** Exception handler for ResultAlreadyReturnedOrRequestIdInvalidException. */
     @ExceptionHandler({ResultAlreadyReturnedOrRequestIdInvalidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleResultAlreadyReturnedOrRequestIdInvalidException(
             ResultAlreadyReturnedOrRequestIdInvalidException ex) {
-        return Response.errorResponse(ResultType.RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID,
+        return Response.errorResponse(
+                ResultType.RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID,
                 Collections.singletonList(ex.getMessage()));
     }
 }

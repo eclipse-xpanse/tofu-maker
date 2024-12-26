@@ -11,9 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.webhook.WebhookConfig;
 
-/**
- * Data model for the openTofu async modify requests.
- */
+/** Data model for the openTofu async modify requests. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuAsyncModifyFromScriptsRequest extends OpenTofuModifyWithScriptsRequest {
@@ -21,5 +19,4 @@ public class OpenTofuAsyncModifyFromScriptsRequest extends OpenTofuModifyWithScr
     @NotNull
     @Schema(description = "Configuration information of webhook.")
     private WebhookConfig webhookConfig;
-
 }

@@ -26,9 +26,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage GIT clone.
- */
+/** Bean to manage GIT clone. */
 @Slf4j
 @Component
 public class ScriptsGitRepoManage {
@@ -36,15 +34,18 @@ public class ScriptsGitRepoManage {
     /**
      * Method to check out scripts from a GIT repo.
      *
-     * @param workspace   directory where the GIT clone must be executed.
+     * @param workspace directory where the GIT clone must be executed.
      * @param scriptsRepo directory inside the GIT repo where scripts are expected to be present.
      */
-    @Retryable(retryFor = GitRepoCloneException.class,
+    @Retryable(
+            retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${spring.retry.max-attempts}",
             backoff = @Backoff(delayExpression = "${spring.retry.delay-millions}"))
     public List<File> checkoutScripts(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
-        log.info("Clone GIT repo to get the deployment scripts. Retry number: "
-                + Objects.requireNonNull(RetrySynchronizationManager.getContext()).getRetryCount());
+        log.info(
+                "Clone GIT repo to get the deployment scripts. Retry number: "
+                        + Objects.requireNonNull(RetrySynchronizationManager.getContext())
+                                .getRetryCount());
         File workspaceDirectory = new File(workspace);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
@@ -73,18 +74,22 @@ public class ScriptsGitRepoManage {
 
     private List<File> getSourceFiles(String workspace, OpenTofuScriptGitRepoDetails scriptsRepo) {
         List<File> sourceFiles = new ArrayList<>();
-        File directory = new File(workspace
-                + (StringUtils.isNotBlank(scriptsRepo.getScriptPath())
-                ? File.separator + scriptsRepo.getScriptPath()
-                : ""));
+        File directory =
+                new File(
+                        workspace
+                                + (StringUtils.isNotBlank(scriptsRepo.getScriptPath())
+                                        ? File.separator + scriptsRepo.getScriptPath()
+                                        : ""));
         if (directory.exists() && directory.isDirectory()) {
             File[] files = directory.listFiles();
             if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile()) {
-                        sourceFiles.add(file);
-                    }
-                });
+                Arrays.stream(files)
+                        .forEach(
+                                file -> {
+                                    if (file.isFile()) {
+                                        sourceFiles.add(file);
+                                    }
+                                });
             }
         }
         return sourceFiles;
@@ -92,15 +97,16 @@ public class ScriptsGitRepoManage {
 
     private void validateIfFolderContainsOpenTofuScripts(
             List<File> files, OpenTofuScriptGitRepoDetails scriptsRepo) {
-        boolean isScriptsExisted = files.stream()
-                .anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
+        boolean isScriptsExisted =
+                files.stream().anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
         if (!isScriptsExisted) {
             throw new InvalidOpenTofuScriptsException(
                     "No OpenTofu scripts found in the "
                             + scriptsRepo.getRepoUrl()
                             + " repo's '"
                             + (StringUtils.isNotBlank(scriptsRepo.getScriptPath())
-                            ? File.separator + scriptsRepo.getScriptPath() : "root")
+                                    ? File.separator + scriptsRepo.getScriptPath()
+                                    : "root")
                             + "' folder.");
         }
     }

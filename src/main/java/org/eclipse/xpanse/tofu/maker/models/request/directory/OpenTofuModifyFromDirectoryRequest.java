@@ -17,9 +17,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.tofu.maker.opentofu.tool.OpenTofuVersionsHelper;
 
-/**
- * Data model for the OpenTofu modify requests.
- */
+/** Data model for the OpenTofu modify requests. */
 @Data
 public class OpenTofuModifyFromDirectoryRequest {
 
@@ -33,16 +31,24 @@ public class OpenTofuModifyFromDirectoryRequest {
     private String openTofuVersion;
 
     @NotNull
-    @Schema(description = "Flag to control if the deployment must only generate the OpenTofu "
-            + "or it must also apply the changes.")
+    @Schema(
+            description =
+                    "Flag to control if the deployment must only generate the OpenTofu "
+                            + "or it must also apply the changes.")
     private Boolean isPlanOnly;
 
     @NotNull
-    @Schema(description = "Key-value pairs of variables that must be used to execute the "
-            + "OpenTofu request.", additionalProperties = TRUE)
+    @Schema(
+            description =
+                    "Key-value pairs of variables that must be used to execute the "
+                            + "OpenTofu request.",
+            additionalProperties = TRUE)
     private Map<String, Object> variables;
 
-    @Schema(description = "Key-value pairs of variables that must be injected as environment "
-            + "variables to OpenTofu process.", additionalProperties = TRUE)
+    @Schema(
+            description =
+                    "Key-value pairs of variables that must be injected as environment "
+                            + "variables to OpenTofu process.",
+            additionalProperties = TRUE)
     private Map<String, String> envVariables = new HashMap<>();
 }

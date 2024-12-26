@@ -29,111 +29,95 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Bean to manage all OpenTofu execution using scripts from a GIT Repo.
- */
+/** Bean to manage all OpenTofu execution using scripts from a GIT Repo. */
 @Slf4j
 @Component
 public class OpenTofuGitRepoService {
 
-    @Resource
-    private RestTemplate restTemplate;
-    @Resource
-    private OpenTofuScriptsHelper scriptsHelper;
-    @Resource
-    private OpenTofuDirectoryService directoryService;
-    @Resource
-    private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
+    @Resource private RestTemplate restTemplate;
+    @Resource private OpenTofuScriptsHelper scriptsHelper;
+    @Resource private OpenTofuDirectoryService directoryService;
+    @Resource private OpenTofuResultPersistenceManage openTofuResultPersistenceManage;
 
-    /**
-     * Method of deployment a service using a script.
-     */
-    public OpenTofuValidationResult validateWithScripts(
-            OpenTofuDeployFromGitRepoRequest request) {
+    /** Method of deployment a service using a script. */
+    public OpenTofuValidationResult validateWithScripts(OpenTofuDeployFromGitRepoRequest request) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(UUID.randomUUID().toString());
         scriptsHelper.prepareDeploymentFilesWithGitRepo(
                 taskWorkspace, request.getGitRepoDetails(), null);
-        String scriptsPath = getScriptsLocationInTaskWorkspace(
-                request.getGitRepoDetails(), taskWorkspace);
+        String scriptsPath =
+                getScriptsLocationInTaskWorkspace(request.getGitRepoDetails(), taskWorkspace);
         return directoryService.tfValidateFromDirectory(scriptsPath, request.getOpenTofuVersion());
     }
 
-    /**
-     * Method to get terraform plan.
-     */
+    /** Method to get terraform plan. */
     public OpenTofuPlan getOpenTofuPlanFromGitRepo(
             OpenTofuPlanFromGitRepoRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
         scriptsHelper.prepareDeploymentFilesWithGitRepo(
                 taskWorkspace, request.getGitRepoDetails(), null);
-        String scriptsPath = getScriptsLocationInTaskWorkspace(
-                request.getGitRepoDetails(), taskWorkspace);
+        String scriptsPath =
+                getScriptsLocationInTaskWorkspace(request.getGitRepoDetails(), taskWorkspace);
         return directoryService.getOpenTofuPlanFromDirectory(request, scriptsPath);
     }
 
-    /**
-     * Method of deployment a service using a script.
-     */
+    /** Method of deployment a service using a script. */
     public OpenTofuResult deployFromGitRepo(OpenTofuDeployFromGitRepoRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> scriptFiles = scriptsHelper.prepareDeploymentFilesWithGitRepo(
-                taskWorkspace, request.getGitRepoDetails(), null);
-        String scriptsPath = getScriptsLocationInTaskWorkspace(
-                request.getGitRepoDetails(), taskWorkspace);
+        List<File> scriptFiles =
+                scriptsHelper.prepareDeploymentFilesWithGitRepo(
+                        taskWorkspace, request.getGitRepoDetails(), null);
+        String scriptsPath =
+                getScriptsLocationInTaskWorkspace(request.getGitRepoDetails(), taskWorkspace);
         OpenTofuResult result =
                 directoryService.deployFromDirectory(request, scriptsPath, scriptFiles);
         scriptsHelper.deleteTaskWorkspace(taskWorkspace);
         return result;
     }
 
-    /**
-     * Method of modify a service using a script.
-     */
+    /** Method of modify a service using a script. */
     public OpenTofuResult modifyFromGitRepo(OpenTofuModifyFromGitRepoRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> scriptFiles = scriptsHelper.prepareDeploymentFilesWithGitRepo(
-                taskWorkspace, request.getGitRepoDetails(), request.getTfState());
-        String scriptsPath = getScriptsLocationInTaskWorkspace(
-                request.getGitRepoDetails(), taskWorkspace);
+        List<File> scriptFiles =
+                scriptsHelper.prepareDeploymentFilesWithGitRepo(
+                        taskWorkspace, request.getGitRepoDetails(), request.getTfState());
+        String scriptsPath =
+                getScriptsLocationInTaskWorkspace(request.getGitRepoDetails(), taskWorkspace);
         OpenTofuResult result =
                 directoryService.modifyFromDirectory(request, scriptsPath, scriptFiles);
         scriptsHelper.deleteTaskWorkspace(taskWorkspace);
         return result;
     }
 
-    /**
-     * Method of destroy a service using a script.
-     */
-    public OpenTofuResult destroyFromGitRepo(
-            OpenTofuDestroyFromGitRepoRequest request, UUID uuid) {
+    /** Method of destroy a service using a script. */
+    public OpenTofuResult destroyFromGitRepo(OpenTofuDestroyFromGitRepoRequest request, UUID uuid) {
         String taskWorkspace = scriptsHelper.buildTaskWorkspace(uuid.toString());
-        List<File> scriptFiles = scriptsHelper.prepareDeploymentFilesWithGitRepo(
-                taskWorkspace, request.getGitRepoDetails(), request.getTfState());
-        String scriptsPath = getScriptsLocationInTaskWorkspace(
-                request.getGitRepoDetails(), taskWorkspace);
+        List<File> scriptFiles =
+                scriptsHelper.prepareDeploymentFilesWithGitRepo(
+                        taskWorkspace, request.getGitRepoDetails(), request.getTfState());
+        String scriptsPath =
+                getScriptsLocationInTaskWorkspace(request.getGitRepoDetails(), taskWorkspace);
         OpenTofuResult result =
                 directoryService.destroyFromDirectory(request, scriptsPath, scriptFiles);
         scriptsHelper.deleteTaskWorkspace(taskWorkspace);
         return result;
     }
 
-    /**
-     * Async deploy a source by terraform.
-     */
+    /** Async deploy a source by terraform. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDeployFromGitRepo(OpenTofuAsyncDeployFromGitRepoRequest asyncDeployRequest,
-                                       UUID uuid) {
+    public void asyncDeployFromGitRepo(
+            OpenTofuAsyncDeployFromGitRepoRequest asyncDeployRequest, UUID uuid) {
         OpenTofuResult result;
         try {
             result = deployFromGitRepo(asyncDeployRequest, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .generatedFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncDeployRequest.getRequestId());
         String url = asyncDeployRequest.getWebhookConfig().getUrl();
@@ -141,23 +125,22 @@ public class OpenTofuGitRepoService {
         sendOpenTofuResult(url, result);
     }
 
-    /**
-     * Async modify a source by terraform.
-     */
+    /** Async modify a source by terraform. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncModifyFromGitRepo(OpenTofuAsyncModifyFromGitRepoRequest asyncModifyRequest,
-                                       UUID uuid) {
+    public void asyncModifyFromGitRepo(
+            OpenTofuAsyncModifyFromGitRepoRequest asyncModifyRequest, UUID uuid) {
         OpenTofuResult result;
         try {
             result = modifyFromGitRepo(asyncModifyRequest, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .generatedFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(asyncModifyRequest.getRequestId());
         String url = asyncModifyRequest.getWebhookConfig().getUrl();
@@ -165,24 +148,21 @@ public class OpenTofuGitRepoService {
         sendOpenTofuResult(url, result);
     }
 
-
-    /**
-     * Async destroy resource of the service.
-     */
+    /** Async destroy resource of the service. */
     @Async(TaskConfiguration.TASK_EXECUTOR_NAME)
-    public void asyncDestroyFromGitRepo(OpenTofuAsyncDestroyFromGitRepoRequest request,
-                                        UUID uuid) {
+    public void asyncDestroyFromGitRepo(OpenTofuAsyncDestroyFromGitRepoRequest request, UUID uuid) {
         OpenTofuResult result;
         try {
             result = destroyFromGitRepo(request, uuid);
         } catch (RuntimeException e) {
-            result = OpenTofuResult.builder()
-                    .commandStdOutput(null)
-                    .commandStdError(e.getMessage())
-                    .isCommandSuccessful(false)
-                    .terraformState(null)
-                    .generatedFileContentMap(new HashMap<>())
-                    .build();
+            result =
+                    OpenTofuResult.builder()
+                            .commandStdOutput(null)
+                            .commandStdError(e.getMessage())
+                            .isCommandSuccessful(false)
+                            .terraformState(null)
+                            .generatedFileContentMap(new HashMap<>())
+                            .build();
         }
         result.setRequestId(request.getRequestId());
         String url = request.getWebhookConfig().getUrl();
@@ -205,5 +185,4 @@ public class OpenTofuGitRepoService {
         }
         return taskWorkSpace;
     }
-
 }

@@ -13,9 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.tofu.maker.models.request.directory.OpenTofuDeployFromDirectoryRequest;
 
-/**
- * OpenTofu uses the request object deployed by the script.
- */
+/** OpenTofu uses the request object deployed by the script. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuDeployWithScriptsRequest extends OpenTofuDeployFromDirectoryRequest {
@@ -26,5 +24,4 @@ public class OpenTofuDeployWithScriptsRequest extends OpenTofuDeployFromDirector
             description =
                     "Map stores file name and content of all script files for deploy request.")
     private Map<String, String> scriptFiles;
-
 }

@@ -14,9 +14,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Caffeine cache configuration class.
- */
+/** Caffeine cache configuration class. */
 @Slf4j
 @Configuration
 public class CaffeineCacheConfig {
@@ -30,14 +28,11 @@ public class CaffeineCacheConfig {
     @Bean
     public CacheManager caffeineCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.registerCustomCache(OPENTOFU_VERSIONS_CACHE_NAME,
-                getOpenTofuVersionsCache());
+        cacheManager.registerCustomCache(OPENTOFU_VERSIONS_CACHE_NAME, getOpenTofuVersionsCache());
         return cacheManager;
     }
-
 
     private Cache<Object, Object> getOpenTofuVersionsCache() {
         return Caffeine.newBuilder().build();
     }
-
 }

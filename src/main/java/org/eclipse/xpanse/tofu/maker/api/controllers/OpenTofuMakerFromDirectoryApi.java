@@ -45,38 +45,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for running open tofu modules directly on the provided directory.
- */
+/** REST controller for running open tofu modules directly on the provided directory. */
 @Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/tofu-maker/directory")
 public class OpenTofuMakerFromDirectoryApi {
-    @Resource
-    private OpenTofuDirectoryService directoryService;
-    @Resource
-    private OpenTofuScriptsHelper scriptsHelper;
+    @Resource private OpenTofuDirectoryService directoryService;
+    @Resource private OpenTofuScriptsHelper scriptsHelper;
 
     /**
      * Method to validate OpenTofu modules.
      *
      * @return Returns the validation status of the OpenTofu module in a workspace.
      */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Validate the OpenTofu modules in the given directory.")
-    @GetMapping(value = "/validate/{module_directory}/{opentofu_version}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/validate/{module_directory}/{opentofu_version}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuValidationResult validateFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
-            @Parameter(name = "opentofu_version",
-                    description = "version of OpenTofu to execute the module files.")
-            @NotBlank @Pattern(regexp = OpenTofuVersionsHelper.OPENTOFU_REQUIRED_VERSION_REGEX)
-            @PathVariable("opentofu_version") String openTofuVersion) {
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
+            @Parameter(
+                            name = "opentofu_version",
+                            description = "version of OpenTofu to execute the module files.")
+                    @NotBlank
+                    @Pattern(regexp = OpenTofuVersionsHelper.OPENTOFU_REQUIRED_VERSION_REGEX)
+                    @PathVariable("opentofu_version")
+                    String openTofuVersion) {
         UUID uuid = UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         return directoryService.tfValidateFromDirectory(moduleDirectory, openTofuVersion);
@@ -87,18 +90,23 @@ public class OpenTofuMakerFromDirectoryApi {
      *
      * @return Returns the status of the deployment.
      */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Deploy resources via OpenTofu from the given directory.")
     @PostMapping(value = "/deploy/{module_directory}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult deployFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuDeployFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
@@ -110,18 +118,23 @@ public class OpenTofuMakerFromDirectoryApi {
      *
      * @return Returns the status of the deployment.
      */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Modify resources via OpenTofu from the given directory.")
     @PostMapping(value = "/modify/{module_directory}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult modifyFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuModifyFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
@@ -133,20 +146,25 @@ public class OpenTofuMakerFromDirectoryApi {
      *
      * @return Returns the status of the resources destroy.
      */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Destroy the resources from the given directory.")
-    @DeleteMapping(value = "/destroy/{module_directory}",
+    @DeleteMapping(
+            value = "/destroy/{module_directory}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuResult destroyFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
-            @Valid @RequestBody
-            OpenTofuDestroyFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
+            @Valid @RequestBody OpenTofuDestroyFromDirectoryRequest request) {
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
@@ -158,84 +176,100 @@ public class OpenTofuMakerFromDirectoryApi {
      *
      * @return Returns the open tofu plan as a JSON string.
      */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "Get OpenTofu Plan as JSON string from the given directory.")
-    @PostMapping(value = "/plan/{module_directory}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/plan/{module_directory}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public OpenTofuPlan plan(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuPlanFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         return directoryService.getOpenTofuPlanFromDirectory(request, moduleDirectory);
     }
 
-    /**
-     * Method to async deploy resources from the given directory.
-     */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    /** Method to async deploy resources from the given directory. */
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "async deploy resources via OpenTofu from the given directory.")
-    @PostMapping(value = "/deploy/async/{module_directory}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            value = "/deploy/async/{module_directory}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDeployFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuAsyncDeployFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
         directoryService.asyncDeployWithScripts(request, moduleDirectory, scriptFiles);
     }
 
-    /**
-     * Method to async modify resources from the given directory.
-     */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    /** Method to async modify resources from the given directory. */
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "async modify resources via OpenTofu from the given directory.")
-    @PostMapping(value = "/modify/async/{module_directory}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            value = "/modify/async/{module_directory}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncModifyFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuAsyncModifyFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);
         directoryService.asyncModifyWithScripts(request, moduleDirectory, scriptFiles);
     }
 
-    /**
-     * Method to async destroy resources from the given directory.
-     */
-    @Tag(name = "OpenTofuFromDirectory", description =
-            "APIs for running OpenTofu commands inside a provided directory.")
+    /** Method to async destroy resources from the given directory. */
+    @Tag(
+            name = "OpenTofuFromDirectory",
+            description = "APIs for running OpenTofu commands inside a provided directory.")
     @Operation(description = "async destroy resources via OpenTofu from the given directory.")
-    @DeleteMapping(value = "/destroy/async/{module_directory}",
+    @DeleteMapping(
+            value = "/destroy/async/{module_directory}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void asyncDestroyFromDirectory(
-            @Parameter(name = "module_directory",
-                    description = "directory name where the OpenTofu module files exist.")
-            @PathVariable("module_directory") String moduleDirectory,
+            @Parameter(
+                            name = "module_directory",
+                            description = "directory name where the OpenTofu module files exist.")
+                    @PathVariable("module_directory")
+                    String moduleDirectory,
             @Valid @RequestBody OpenTofuAsyncDestroyFromDirectoryRequest request) {
-        UUID uuid = Objects.nonNull(request.getRequestId())
-                ? request.getRequestId() : UUID.randomUUID();
+        UUID uuid =
+                Objects.nonNull(request.getRequestId())
+                        ? request.getRequestId()
+                        : UUID.randomUUID();
         MDC.put(REQUEST_ID, uuid.toString());
         request.setRequestId(uuid);
         List<File> scriptFiles = scriptsHelper.getDeploymentFilesFromTaskWorkspace(moduleDirectory);

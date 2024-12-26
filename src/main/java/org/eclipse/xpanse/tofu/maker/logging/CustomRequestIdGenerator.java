@@ -11,18 +11,12 @@ import org.springframework.lang.NonNull;
 import org.zalando.logbook.CorrelationId;
 import org.zalando.logbook.HttpRequest;
 
-/**
- * Custom unique ID generated per request by Logbook.
- */
+/** Custom unique ID generated per request by Logbook. */
 public class CustomRequestIdGenerator implements CorrelationId {
-    /**
-     * The key of the request id in MDC.
-     */
+    /** The key of the request id in MDC. */
     public static final String REQUEST_ID = "REQUEST_ID";
 
-    /**
-     * The key of the tracking id in MDC.
-     */
+    /** The key of the tracking id in MDC. */
     private static final String TRACKING_ID = "TRACKING_ID";
 
     @Override

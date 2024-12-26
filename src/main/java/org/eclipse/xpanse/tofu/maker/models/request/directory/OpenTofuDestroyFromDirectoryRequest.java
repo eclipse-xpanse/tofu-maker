@@ -17,9 +17,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.tofu.maker.opentofu.tool.OpenTofuVersionsHelper;
 
-/**
- * Data model for the OpenTofu destroy requests.
- */
+/** Data model for the OpenTofu destroy requests. */
 @Data
 public class OpenTofuDestroyFromDirectoryRequest {
 
@@ -33,11 +31,17 @@ public class OpenTofuDestroyFromDirectoryRequest {
     private String openTofuVersion;
 
     @NotNull
-    @Schema(description = "Key-value pairs of regular variables that must be used to execute the "
-            + "OpenTofu request.", additionalProperties = TRUE)
+    @Schema(
+            description =
+                    "Key-value pairs of regular variables that must be used to execute the "
+                            + "OpenTofu request.",
+            additionalProperties = TRUE)
     private Map<String, Object> variables;
 
-    @Schema(description = "Key-value pairs of variables that must be injected as environment "
-            + "variables to OpenTofu process.", additionalProperties = TRUE)
+    @Schema(
+            description =
+                    "Key-value pairs of variables that must be injected as environment "
+                            + "variables to OpenTofu process.",
+            additionalProperties = TRUE)
     private Map<String, String> envVariables = new HashMap<>();
 }
