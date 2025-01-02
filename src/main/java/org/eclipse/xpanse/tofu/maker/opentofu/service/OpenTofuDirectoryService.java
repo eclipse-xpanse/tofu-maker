@@ -47,10 +47,10 @@ public class OpenTofuDirectoryService {
     private static final String HELLO_WORLD_TF_NAME = "hello_world.tf";
     private static final String HELLO_WORLD_TEMPLATE =
             """
-            output "hello_world" {
-                value = "Hello, World!"
-            }
-            """;
+                    output "hello_world" {
+                        value = "Hello, World!"
+                    }
+                    """;
     @Resource private OpenTofuExecutor executor;
     @Resource private OpenTofuInstaller installer;
     @Resource private RestTemplate restTemplate;
@@ -319,10 +319,14 @@ public class OpenTofuDirectoryService {
             SystemCmdResult result, String taskWorkspace, List<File> scriptFiles) {
         OpenTofuResult openTofuResult =
                 OpenTofuResult.builder().isCommandSuccessful(result.isCommandSuccessful()).build();
-        BeanUtils.copyProperties(result, openTofuResult);
-        openTofuResult.setTerraformState(scriptsHelper.getTerraformState(taskWorkspace));
-        openTofuResult.setGeneratedFileContentMap(
-                scriptsHelper.getDeploymentGeneratedFilesContent(taskWorkspace, scriptFiles));
+        try {
+            BeanUtils.copyProperties(result, openTofuResult);
+            openTofuResult.setTerraformState(scriptsHelper.getTerraformState(taskWorkspace));
+            openTofuResult.setGeneratedFileContentMap(
+                    scriptsHelper.getDeploymentGeneratedFilesContent(taskWorkspace, scriptFiles));
+        } catch (Exception e) {
+            log.error("Failed to get terraform state and generated files content.", e);
+        }
         return openTofuResult;
     }
 }
