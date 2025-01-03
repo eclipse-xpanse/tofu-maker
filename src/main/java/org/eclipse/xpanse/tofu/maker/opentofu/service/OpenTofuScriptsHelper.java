@@ -36,7 +36,7 @@ public class OpenTofuScriptsHelper {
     public static final String TF_SCRIPT_FILE_EXTENSION = ".tf";
     private static final String TF_STATE_FILE_NAME = "terraform.tfstate";
     private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
-            Arrays.asList(".tf", ".tfstate", ".hcl");
+            Arrays.asList(".tf", ".tfstate", ".binary", ".hcl");
 
     @Value("${opentofu.root.module.directory}")
     private String moduleParentDirectoryPath;
@@ -216,33 +216,28 @@ public class OpenTofuScriptsHelper {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
                 Arrays.stream(files)
+                        .filter(
+                                file ->
+                                        !scriptFiles.contains(file)
+                                                && file.isFile()
+                                                && !isExcludedFile(file.getName()))
                         .forEach(
                                 file -> {
-                                    if (file.isFile()
-                                            && !isExcludedFile(file.getName())
-                                            && !scriptFiles.contains(file)) {
-                                        String content = readFileContentAndDelete(file);
-                                        fileContentMap.put(file.getName(), content);
-                                    }
+                                    String content = readFileContent(file);
+                                    fileContentMap.put(file.getName(), content);
                                 });
             }
         }
         return fileContentMap;
     }
 
-    private String readFileContentAndDelete(File file) {
-        String fileContent = "";
+    private String readFileContent(File file) {
         try {
-            fileContent = Files.readString(file.toPath());
-            boolean deleted = Files.deleteIfExists(file.toPath());
-            log.info(
-                    "Read file content with name:{} successfully. Delete result：{}",
-                    file.getName(),
-                    deleted);
+            return Files.readString(file.toPath());
         } catch (IOException e) {
             log.error("Read file content with name:{} error.", file.getName(), e);
         }
-        return fileContent;
+        return null;
     }
 
     /**
@@ -272,8 +267,11 @@ public class OpenTofuScriptsHelper {
     }
 
     private boolean isExcludedFile(String fileName) {
-        String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
-        return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
+        if (StringUtils.isNotBlank(fileName) && fileName.contains(".")) {
+            String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
+            return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
+        }
+        return false;
     }
 
     private String getModuleParentDirectoryPath() {
