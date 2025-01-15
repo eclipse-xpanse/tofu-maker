@@ -34,7 +34,7 @@
 		<maven.complier.plugin.version>3.13.0</maven.complier.plugin.version>
 		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 		<maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
-		<spotless.version>2.43.0</spotless.version>
+		<spotless.version>2.44.2</spotless.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
