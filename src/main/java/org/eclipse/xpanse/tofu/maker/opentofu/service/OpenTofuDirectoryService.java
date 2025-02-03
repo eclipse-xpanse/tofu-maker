@@ -311,6 +311,7 @@ public class OpenTofuDirectoryService {
         try {
             restTemplate.postForLocation(url, result);
         } catch (RestClientException e) {
+            log.error("error while sending openTofu result", e);
             openTofuResultPersistenceManage.persistOpenTofuResult(result);
         }
     }
