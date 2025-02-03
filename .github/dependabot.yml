@@ -10,6 +10,11 @@ updates:
     directory: /
     schedule:
       interval: daily
+    groups:
+      spring-boot:
+        applies-to: version-updates
+        patterns:
+          - 'org.springframework.boot:spring-boot-starter*'
   - package-ecosystem: docker
     directory: /
     schedule:
