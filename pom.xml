@@ -15,7 +15,7 @@
 	</parent>
 	<groupId>org.eclipse.xpanse.tofu.maker</groupId>
 	<artifactId>tofu-maker</artifactId>
-	<version>1.0.12-SNAPSHOT</version>
+	<version>1.0.13</version>
 	<name>tofu-maker</name>
 	<description>RESTful API Wrapper for OpenTofu</description>
 	<properties>
