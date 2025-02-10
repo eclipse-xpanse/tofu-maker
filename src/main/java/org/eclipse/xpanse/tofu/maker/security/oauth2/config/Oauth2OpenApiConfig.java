@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Profile;
         info =
                 @Info(
                         title = "Tofu-Maker API",
-                        description = "RESTful Services to interact with Tofu-Maker runtime",
+                        description = "RESTful Services to interact with opentofu CLI",
                         version = "${app.version}"),
         security =
                 @SecurityRequirement(

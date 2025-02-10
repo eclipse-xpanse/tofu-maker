@@ -19,6 +19,6 @@ public class WebhookConfig {
     private String url;
 
     @NotNull
-    @Schema(description = "The permission type when calling back.")
+    @Schema(description = "The authentication type when calling back.")
     private AuthType authType;
 }
