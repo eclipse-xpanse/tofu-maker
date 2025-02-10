@@ -39,14 +39,12 @@ public class OpenTofuDeployFromDirectoryRequest {
     @Schema(
             description =
                     "Key-value pairs of variables that must be used to execute the "
-                            + "OpenTofu request.",
-            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
+                            + "OpenTofu request.")
     private Map<String, Object> variables;
 
     @Schema(
             description =
                     "Key-value pairs of variables that must be injected as environment "
-                            + "variables to OpenTofu process.",
-            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
+                            + "variables to OpenTofu process.")
     private Map<String, String> envVariables = new HashMap<>();
 }
