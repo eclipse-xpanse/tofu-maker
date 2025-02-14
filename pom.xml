@@ -29,7 +29,7 @@
 		<eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
 		<jgit.version>7.1.0.202411261347-r</jgit.version>
 		<semver4j.version>5.6.0</semver4j.version>
-		<github-api.version>1.326</github-api.version>
+		<github-api.version>1.327</github-api.version>
 		<eclipse.serializer.version>2.1.1</eclipse.serializer.version>
 		<maven.complier.plugin.version>3.13.0</maven.complier.plugin.version>
 		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
