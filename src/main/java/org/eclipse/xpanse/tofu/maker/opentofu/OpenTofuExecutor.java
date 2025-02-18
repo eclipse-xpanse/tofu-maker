@@ -66,7 +66,7 @@ public class OpenTofuExecutor {
     /** OpenTofu executes init, plan and destroy commands. */
     public SystemCmdResult tfDestroy(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         tfPlan(executorPath, variables, envVariables, taskWorkspace);
@@ -83,7 +83,7 @@ public class OpenTofuExecutor {
     /** OpenTofu executes init, plan and apply commands. */
     public SystemCmdResult tfApply(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         tfPlan(executorPath, variables, envVariables, taskWorkspace);
@@ -100,7 +100,7 @@ public class OpenTofuExecutor {
     /** OpenTofu executes init and plan commands. */
     public SystemCmdResult tfPlan(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         tfInit(executorPath, taskWorkspace);
@@ -117,7 +117,7 @@ public class OpenTofuExecutor {
     /** Method to execute openTofu plan and get the plan as a json string. */
     public String getOpenTofuPlanAsJson(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         tfInit(executorPath, taskWorkspace);
@@ -193,7 +193,7 @@ public class OpenTofuExecutor {
      */
     private SystemCmdResult tfPlanCommand(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         return executeWithVariables(
@@ -210,7 +210,7 @@ public class OpenTofuExecutor {
      */
     private SystemCmdResult tfApplyCommand(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         return executeWithVariables(
@@ -229,7 +229,7 @@ public class OpenTofuExecutor {
      */
     private SystemCmdResult tfDestroyCommand(
             String executorPath,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         return executeWithVariables(
@@ -246,7 +246,7 @@ public class OpenTofuExecutor {
      */
     private SystemCmdResult executeWithVariables(
             StringBuilder command,
-            Map<String, Object> variables,
+            Map<String, String> variables,
             Map<String, String> envVariables,
             String taskWorkspace) {
         createVariablesFile(variables, taskWorkspace);
@@ -280,7 +280,7 @@ public class OpenTofuExecutor {
         return Collections.singletonMap("TF_LOG", this.openTofuLogLevel);
     }
 
-    private void createVariablesFile(Map<String, Object> variables, String taskWorkspace) {
+    private void createVariablesFile(Map<String, String> variables, String taskWorkspace) {
         try {
             log.info("creating variables file");
             File varFile = new File(taskWorkspace, TF_VARS_FILE_NAME);

@@ -33,7 +33,7 @@ public class OpenTofuPlanFromDirectoryRequest {
             description =
                     "Key-value pairs of variables that must be used to execute the "
                             + "OpenTofu request.")
-    private Map<String, Object> variables;
+    private Map<String, String> variables;
 
     @Schema(
             description =
