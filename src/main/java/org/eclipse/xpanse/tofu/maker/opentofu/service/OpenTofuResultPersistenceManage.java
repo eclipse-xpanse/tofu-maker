@@ -42,19 +42,14 @@ public class OpenTofuResultPersistenceManage {
      * @param result OpenTofuResult.
      */
     public void persistOpenTofuResult(OpenTofuResult result) {
-        String filePath = getFilePath(result.getRequestId());
-        File file = new File(filePath);
-        if (!file.exists() && !file.mkdirs()) {
+        File filePath = getFilePath(result.getRequestId());
+        if (!filePath.exists() && !filePath.mkdirs()) {
             log.error("Failed to create directory {}", filePath);
             return;
         }
+        File file = new File(filePath, getFileName(result.getRequestId()));
         byte[] openTofuResultData = openTofuResultSerializer.serialize(result);
-        try (FileOutputStream fos =
-                new FileOutputStream(
-                        file.getPath()
-                                + File.separator
-                                + result.getRequestId()
-                                + TF_RESULT_FILE_SUFFIX)) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(openTofuResultData);
             log.info(
                     "openTofu result successfully stored to directoryName: {}",
@@ -74,10 +69,10 @@ public class OpenTofuResultPersistenceManage {
      * @param requestId requestId.
      * @return OpenTofuResult.
      */
-    public ResponseEntity<OpenTofuResult> retrieveOpenTofuResultByRequestId(String requestId) {
-        String filePath = getFilePath(UUID.fromString(requestId));
-        File resultFile = new File(filePath + File.separator + requestId + TF_RESULT_FILE_SUFFIX);
+    public ResponseEntity<OpenTofuResult> retrieveOpenTofuResultByRequestId(UUID requestId) {
+        File resultFile = new File(getFilePath(requestId), getFileName(requestId));
         if (!resultFile.exists() && !resultFile.isFile()) {
+            log.warn("Result file does not exist: {}", resultFile.getAbsolutePath());
             if (isDeployingInProgress(requestId)) {
                 return ResponseEntity.noContent().build();
             }
@@ -89,7 +84,7 @@ public class OpenTofuResultPersistenceManage {
             OpenTofuResult openTofuResult =
                     openTofuResultSerializer.deserialize(openTofuResultData);
             fis.close();
-            deleteResultFileAndDirectory(new File(filePath));
+            deleteResultFileAndDirectory(resultFile);
             return ResponseEntity.ok(openTofuResult);
         } catch (IOException e) {
             log.error("Failed to retrieve OpenTofuResult for requestId: {}", requestId, e);
@@ -98,8 +93,8 @@ public class OpenTofuResultPersistenceManage {
         }
     }
 
-    private boolean isDeployingInProgress(String requestId) {
-        String workspace = scriptsHelper.buildTaskWorkspace(requestId);
+    private boolean isDeployingInProgress(UUID requestId) {
+        String workspace = scriptsHelper.buildTaskWorkspace(requestId.toString());
         File targetFile;
         if (cleanWorkspaceAfterDeployment) {
             targetFile = new File(workspace);
@@ -113,10 +108,9 @@ public class OpenTofuResultPersistenceManage {
     private void deleteResultFileAndDirectory(File resultFile) {
         try {
             deleteRecursively(resultFile);
-            log.info("File folder deleted successfully: " + resultFile.getAbsolutePath());
+            log.info("File folder deleted successfully: {}", resultFile.getAbsolutePath());
         } catch (Exception e) {
-            log.error("An error occurred while deleting files: " + e.getMessage());
-            e.printStackTrace();
+            log.error("An error occurred while deleting files: {}", e.getMessage());
         }
     }
 
@@ -132,7 +126,11 @@ public class OpenTofuResultPersistenceManage {
         file.delete();
     }
 
-    private String getFilePath(UUID requestId) {
-        return failedCallbackStoreLocation + File.separator + requestId.toString();
+    private File getFilePath(UUID requestId) {
+        return new File(failedCallbackStoreLocation + File.separator + requestId);
+    }
+
+    private String getFileName(UUID requestId) {
+        return requestId + TF_RESULT_FILE_SUFFIX;
     }
 }

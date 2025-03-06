@@ -29,12 +29,12 @@ public class OpenTofuApiExceptionHandler {
 
     /** Exception handler for IllegalArgumentException. */
     @ExceptionHandler({IllegalArgumentException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("handleIllegalArgumentException: ", ex);
         return Response.errorResponse(
-                ResultType.OPENTOFU_EXECUTION_FAILED, Collections.singletonList(ex.getMessage()));
+                ResultType.UNPROCESSABLE_ENTITY, Collections.singletonList(ex.getMessage()));
     }
 
     /** Exception handler for OpenTofuExecutorException. */
