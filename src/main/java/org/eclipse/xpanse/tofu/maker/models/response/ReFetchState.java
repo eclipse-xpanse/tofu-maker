@@ -12,8 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 /** ReFetch state for the REST API. */
 public enum ReFetchState {
     OK("OK"),
-    RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID("ResultAlreadyReturnedOrRequestIdInvalid");
-
+    ORDER_IN_PROGRESS("OrderInProgress"),
+    RESULT_NOT_FOUND("ResultNotFound"),
+    RESULT_PARSE_FAILED("ResultParseFailed");
     private final String state;
 
     ReFetchState(String state) {

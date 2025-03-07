@@ -14,29 +14,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenTofuResultSerializer {
 
+    private final Serializer<byte[]> serializer;
+
+    /** Constructor to initialize the Serializer with OpenTofuResult class registered. */
+    public OpenTofuResultSerializer() {
+        final SerializerFoundation<?> foundation =
+                SerializerFoundation.New().registerEntityTypes(OpenTofuResult.class);
+        this.serializer = Serializer.Bytes(foundation);
+    }
+
     /**
-     * serialize OpenTofuResult object.
+     * Serialize OpenTofuResult object.
      *
      * @param result OpenTofuResult.
      * @return byte[].
      */
     public byte[] serialize(OpenTofuResult result) {
-        final SerializerFoundation<?> foundation =
-                SerializerFoundation.New().registerEntityTypes(OpenTofuResult.class);
-        Serializer<byte[]> serializer = Serializer.Bytes(foundation);
         return serializer.serialize(result);
     }
 
     /**
-     * deserialize OpenTofuResult object.
+     * Deserialize OpenTofuResult object.
      *
      * @param data byte[].
      * @return OpenTofuResult.
      */
     public OpenTofuResult deserialize(byte[] data) {
-        final SerializerFoundation<?> foundation =
-                SerializerFoundation.New().registerEntityTypes(OpenTofuResult.class);
-        Serializer<byte[]> serializer = Serializer.Bytes(foundation);
         return serializer.deserialize(data);
     }
 }
