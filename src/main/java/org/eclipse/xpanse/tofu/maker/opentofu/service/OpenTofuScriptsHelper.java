@@ -53,12 +53,22 @@ public class OpenTofuScriptsHelper {
      * @return workspace path for the OpenTofu deployment task.
      */
     public String buildTaskWorkspace(String taskId) {
-        File ws = new File(getModuleParentDirectoryPath(), taskId);
+        File ws = getTaskWorkspace(taskId);
         if (!ws.exists() && !ws.mkdirs()) {
             throw new OpenTofuExecutorException(
                     "Create task workspace failed, File path not created: " + ws.getAbsolutePath());
         }
         return ws.getAbsolutePath();
+    }
+
+    /**
+     * Get the workspace path for the OpenTofu deployment task.
+     *
+     * @param taskId id of the OpenTofu deployment task.
+     * @return workspace path for the OpenTofu deployment task.
+     */
+    public File getTaskWorkspace(String taskId) {
+        return new File(getModuleParentDirectoryPath(), taskId);
     }
 
     /**
