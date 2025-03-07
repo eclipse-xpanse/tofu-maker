@@ -31,7 +31,7 @@
 		<semver4j.version>5.6.0</semver4j.version>
 		<github-api.version>1.327</github-api.version>
 		<eclipse.serializer.version>2.1.2</eclipse.serializer.version>
-		<maven.complier.plugin.version>3.13.0</maven.complier.plugin.version>
+		<maven.complier.plugin.version>3.14.0</maven.complier.plugin.version>
 		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 		<maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
 		<spotless.version>2.44.3</spotless.version>
