@@ -38,7 +38,7 @@ public class OpenTofuVersionsCacheManager implements ApplicationListener<Applica
     }
 
     /**
-     * Update the cache with the versions fetched from the Terraform website. This method is
+     * Update the cache with the versions fetched from the OprnTofu website. This method is
      * scheduled run once a day.
      */
     @Scheduled(cron = "0 0 1 * * ?")
