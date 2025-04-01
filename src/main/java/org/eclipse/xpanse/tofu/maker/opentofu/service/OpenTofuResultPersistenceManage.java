@@ -30,7 +30,7 @@ public class OpenTofuResultPersistenceManage {
     @Value("${failed.callback.response.store.location}")
     private String failedCallbackStoreLocation;
 
-    @Resource private OpenTofuScriptsHelper scriptsHelper;
+    @Resource private OpenTofuScriptsDirectoryHelper scriptsHelper;
     @Resource private OpenTofuResultSerializer openTofuResultSerializer;
 
     /**
@@ -77,13 +77,13 @@ public class OpenTofuResultPersistenceManage {
             return buildErrorResponse(requestId, errorMsg, ReFetchState.RESULT_NOT_FOUND);
         }
         try (FileInputStream fis = new FileInputStream(resultFile)) {
-            OpenTofuResult terraformResult =
+            OpenTofuResult openTofuResult =
                     openTofuResultSerializer.deserialize(fis.readAllBytes());
             deleteResultFileAndDirectory(resultFile);
             return ReFetchResult.builder()
                     .requestId(requestId)
                     .state(ReFetchState.OK)
-                    .openTofuResult(terraformResult)
+                    .openTofuResult(openTofuResult)
                     .build();
         } catch (Exception e) {
             String errorMsg =

@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.tofu.maker.models.response.Response;
 import org.eclipse.xpanse.tofu.maker.models.response.ResultType;
+import org.springframework.amqp.AmqpException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
@@ -52,6 +53,7 @@ public class OpenTofuApiExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
+        log.error("handleUnsupportedEnumValueException: ", ex);
         return Response.errorResponse(
                 ResultType.UNSUPPORTED_ENUM_VALUE, Collections.singletonList(ex.getMessage()));
     }
@@ -62,6 +64,7 @@ public class OpenTofuApiExceptionHandler {
     @ResponseBody
     public Response handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
+        log.error("handleMethodArgumentTypeMismatchException: ", ex);
         return Response.errorResponse(
                 ResultType.UNPROCESSABLE_ENTITY, Collections.singletonList(ex.getMessage()));
     }
@@ -90,16 +93,6 @@ public class OpenTofuApiExceptionHandler {
                 ResultType.BAD_PARAMETERS, Collections.singletonList(failMessage));
     }
 
-    /** Exception handler for OpenTofuHealthCheckException. */
-    @ExceptionHandler({OpenTofuHealthCheckException.class})
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public Response handleOpenTofuHealthCheckException(OpenTofuHealthCheckException ex) {
-        log.error("OpenTofuHealthCheckException: ", ex);
-        String failMessage = ex.getMessage();
-        return Response.errorResponse(
-                ResultType.SERVICE_UNAVAILABLE, Collections.singletonList(failMessage));
-    }
-
     /** Exception handler for GitRepoCloneException. */
     @ExceptionHandler({GitRepoCloneException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -115,6 +108,7 @@ public class OpenTofuApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleInvalidOpenTofuToolException(InvalidOpenTofuToolException ex) {
+        log.error("handleInvalidOpenTofuToolException: ", ex);
         return Response.errorResponse(
                 ResultType.INVALID_OPENTOFU_TOOL, Collections.singletonList(ex.getMessage()));
     }
@@ -124,7 +118,28 @@ public class OpenTofuApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleInvalidOpenTofuScriptsException(InvalidOpenTofuScriptsException ex) {
+        log.error("handleInvalidOpenTofuScriptsException: ", ex);
         return Response.errorResponse(
                 ResultType.INVALID_OPENTOFU_SCRIPTS, Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for InvalidOpenTofuRequestException. */
+    @ExceptionHandler({InvalidOpenTofuRequestException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidOpenTofuRequestException(InvalidOpenTofuRequestException ex) {
+        log.error("handleInvalidOpenTofuRequestException: ", ex);
+        return Response.errorResponse(
+                ResultType.INVALID_OPENTOFU_REQUEST, Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for AmqpException. */
+    @ExceptionHandler({AmqpException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleAmqpException(AmqpException ex) {
+        log.error("handleAmqpException: ", ex);
+        return Response.errorResponse(
+                ResultType.SEND_AMQP_MESSAGE_FAILED, Collections.singletonList(ex.getMessage()));
     }
 }

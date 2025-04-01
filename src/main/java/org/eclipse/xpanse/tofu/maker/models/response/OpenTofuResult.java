@@ -7,6 +7,8 @@ package org.eclipse.xpanse.tofu.maker.models.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Builder;
@@ -15,9 +17,12 @@ import lombok.Data;
 /** Data model for the OpenTofu command execution results. */
 @Data
 @Builder
-public class OpenTofuResult {
+public class OpenTofuResult implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1263344262742565184L;
 
     @Schema(description = "Id of the request.")
+    @NotNull
     private UUID requestId;
 
     @NotNull
