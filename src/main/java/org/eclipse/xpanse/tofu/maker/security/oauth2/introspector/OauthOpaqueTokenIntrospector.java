@@ -26,7 +26,10 @@ public class OauthOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
     public OauthOpaqueTokenIntrospector(
             String introspectionUri, String clientId, String clientSecret) {
         opaqueTokenIntrospector =
-                new SpringOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
+                SpringOpaqueTokenIntrospector.withIntrospectionUri(introspectionUri)
+                        .clientId(clientId)
+                        .clientSecret(clientSecret)
+                        .build();
     }
 
     /**
