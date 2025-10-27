@@ -30,7 +30,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -78,17 +77,8 @@ public class Oauth2WebSecurityConfig {
                 httpSecurityCorsConfigurer ->
                         httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
 
-        http.authorizeHttpRequests(
-                arc -> {
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**"))
-                            .permitAll();
-                    arc.requestMatchers(
-                                    AntPathRequestMatcher.antMatcher(springwolfPathBase + "/**"))
-                            .permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/v3/**")).permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
-                    arc.anyRequest().authenticated();
-                });
+        http.securityMatcher("/tofu-maker/**");
+        http.authorizeHttpRequests(arc -> arc.requestMatchers("/tofu-maker/**").authenticated());
 
         http.csrf(AbstractHttpConfigurer::disable);
 

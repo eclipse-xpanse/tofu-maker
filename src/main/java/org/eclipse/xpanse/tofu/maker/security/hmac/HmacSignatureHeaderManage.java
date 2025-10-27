@@ -89,10 +89,11 @@ public class HmacSignatureHeaderManage {
     private String getSignatureValue(
             String nonce, String currentTimeStamp, String webhookUrl, String payload) {
         return """
-               %s
-               %s
-               %s
-               %s"""
+        %s
+        %s
+        %s
+        %s\
+        """
                 .formatted(nonce, currentTimeStamp, webhookUrl, payload);
     }
 
